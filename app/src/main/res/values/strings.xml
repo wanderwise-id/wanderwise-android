@@ -10,4 +10,8 @@
     <string name="rank">Rank</string>
     <string name="post">Post</string>
     <string name="profile">Profile</string>
+    <string name="current_location">Current location:</string>
+    <string name="safety_score">Safety score:</string>
+    <string name="_29_c">29°C</string>
+    <string name="_33">33</string>
 </resources>

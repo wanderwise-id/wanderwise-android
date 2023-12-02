@@ -6,7 +6,4 @@
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
 
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
