@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">WanderWise</string>
+    <string name="city_image">City Image</string>
+    <string name="location_icon">Location Icon</string>
+    <string name="denpasar">Denpasar</string>
+    <string name="safe">Safe</string>
+    <string name="like_icon">Like Icon</string>
+    <string name="safety_level">Safety Level</string>
 </resources>
