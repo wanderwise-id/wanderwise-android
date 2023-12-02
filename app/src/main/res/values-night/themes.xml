@@ -1,9 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.WanderWise" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.WanderWise" parent="Theme.Material3.Dark">
         <item name="colorPrimary">@color/md_theme_dark_onPrimary</item>
         <item name="colorPrimaryVariant">@color/md_theme_dark_onPrimary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
+        <item name="colorPrimaryDark">@color/md_theme_dark_onPrimary</item>
+        <item name="colorAccent">@color/md_theme_dark_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_dark_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_dark_onPrimaryContainer</item>
         <item name="colorSecondary">@color/md_theme_dark_secondary</item>
@@ -28,6 +30,7 @@
         <item name="colorOnSurfaceInverse">@color/md_theme_dark_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
+        <item name="colorPrimarySurface">@color/md_theme_dark_onPrimary</item>
     </style>
 
     <style name="BottomNavTextStyleIsActive">

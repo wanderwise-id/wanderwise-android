@@ -53,7 +53,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"
-                android:layout_marginStart="13dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="7dp"
                 android:backgroundTint="@color/cardview_light_background"
                 app:cardCornerRadius="34dp"
@@ -70,10 +70,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:background="@drawable/safe_icon_medium"
+                        android:contentDescription="@string/safety_level"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:contentDescription="@string/safety_level" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
                         android:id="@+id/safety_level"

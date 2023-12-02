@@ -15,4 +15,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
+        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@drawable/navbar_select"
+        app:itemTextAppearanceActive="@style/BottomNavTextStyleIsActive"
+        app:itemTextAppearanceInactive="@style/BottomNavTextStyleIsNonActive"
+        app:backgroundTint="@color/md_theme_light_onTertiary"
+        android:background="?android:attr/windowBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/navigation_bar_menu"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
