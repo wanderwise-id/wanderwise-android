@@ -42,6 +42,8 @@ class PostActivity : AppCompatActivity() {
             }
             true
         }
+
+        supportActionBar?.hide()
     }
 
     override fun onBackPressed() {

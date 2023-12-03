@@ -42,6 +42,8 @@ class ProfileActivity : AppCompatActivity() {
             }
             true
         }
+
+        supportActionBar?.hide()
     }
 
     override fun onBackPressed() {
