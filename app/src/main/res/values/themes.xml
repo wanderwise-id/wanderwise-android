@@ -1,5 +1,5 @@
 <resources>
-    <style name="Base.Theme.WanderWise" parent="Theme.Material3.Light">
+    <style name="Base.Theme.WanderWise" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/md_theme_dark_onPrimary</item>
         <item name="colorPrimaryVariant">@color/md_theme_dark_onPrimary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
