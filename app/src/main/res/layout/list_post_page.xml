@@ -6,11 +6,10 @@
     android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/card_popular_post"
         android:layout_width="344dp"
-        android:layout_height="170dp"
-        android:elevation="50dp"
+        android:layout_height="wrap_content"
         app:cardCornerRadius="20dp"
+        android:elevation="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -20,120 +19,126 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/city_preview_post"
-                android:layout_width="112dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="7dp"
-                android:layout_marginBottom="7dp"
+                android:id="@+id/post_image_preview"
+                android:layout_width="match_parent"
+                android:layout_height="344dp"
                 android:src="@drawable/testing"
                 android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <ImageView
+                android:id="@+id/user_image"
+                android:layout_width="31dp"
+                android:layout_height="31dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="18dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/preview_user_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/post_image_preview" />
+
             <TextView
-                android:id="@+id/username_popular"
+                android:id="@+id/username_user_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="17dp"
                 android:fontFamily="@font/figtree_semi_bold"
                 android:text="@string/alex_bramartha"
                 android:textSize="16sp"
-                app:layout_constraintStart_toEndOf="@+id/city_preview_post"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/user_image"
+                app:layout_constraintTop_toBottomOf="@+id/post_image_preview" />
 
             <TextView
                 android:id="@+id/date_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
+                android:layout_marginStart="15dp"
                 android:fontFamily="@font/figtree_medium"
                 android:text="@string/november_20_2023"
-                android:textSize="11sp"
                 android:textColor="#ADADAD"
-                app:layout_constraintStart_toEndOf="@+id/city_preview_post"
-                app:layout_constraintTop_toBottomOf="@+id/username_popular" />
+                android:textSize="11sp"
+                app:layout_constraintStart_toEndOf="@+id/user_image"
+                app:layout_constraintTop_toBottomOf="@+id/username_user_post" />
 
             <TextView
-                android:id="@+id/description_popular"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="17dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginEnd="17dp"
+                android:id="@+id/description_post"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="18dp"
                 android:layout_marginBottom="15dp"
-                android:ellipsize="end"
                 android:fontFamily="@font/figtree_medium"
-                android:maxLines="4"
-                android:text="@string/description_dummy"
                 android:textSize="12sp"
-                app:layout_constraintBottom_toTopOf="@+id/like_button"
+                android:text="@string/description_dummy"
+                app:layout_constraintBottom_toTopOf="@+id/like_button_post"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/city_preview_post"
-                app:layout_constraintTop_toBottomOf="@+id/date_post" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/user_image" />
 
             <ImageView
-                android:id="@+id/like_button"
+                android:id="@+id/like_button_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="17dp"
+                android:layout_marginStart="18dp"
                 android:layout_marginBottom="18dp"
-                android:src="@drawable/like_icon_small"
+                android:src="@drawable/like_icon_medium"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/city_preview_post" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/like_amount"
+                android:id="@+id/like_amount_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginStart="7dp"
+                android:layout_marginBottom="18dp"
                 android:fontFamily="@font/figtree_medium"
                 android:text="@string/_133"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/like_button" />
+                app:layout_constraintStart_toEndOf="@+id/like_button_post" />
 
             <ImageView
-                android:id="@+id/dislike_button"
+                android:id="@+id/dislike_button_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="13dp"
+                android:layout_marginStart="18dp"
                 android:layout_marginBottom="18dp"
-                android:src="@drawable/dislike_icon_small"
+                android:src="@drawable/dislike_icon_medium"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/like_amount" />
+                app:layout_constraintStart_toEndOf="@+id/like_amount_post" />
 
             <TextView
-                android:id="@+id/dislike_amount"
+                android:id="@+id/dislike_amount_post"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginStart="7dp"
+                android:layout_marginBottom="18dp"
                 android:fontFamily="@font/figtree_medium"
                 android:text="@string/_33"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/dislike_button" />
+                app:layout_constraintStart_toEndOf="@+id/dislike_button_post" />
 
             <ImageView
-                android:id="@+id/loc_icon"
+                android:id="@+id/location_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="7dp"
                 android:layout_marginBottom="18dp"
-                android:src="@drawable/loc_icon"
+                android:src="@drawable/loc_icon_medium"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/location" />
+                app:layout_constraintEnd_toStartOf="@+id/location_name_post" />
 
             <TextView
-                android:id="@+id/location"
-                android:layout_width="0dp"
+                android:id="@+id/location_name_post"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="17dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginBottom="18dp"
                 android:fontFamily="@font/figtree_medium"
                 android:text="@string/denpasar"
                 android:textSize="12sp"
