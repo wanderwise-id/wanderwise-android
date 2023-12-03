@@ -22,4 +22,6 @@
     <string name="welcome">Welcome,</string>
     <string name="explore_more_city">Explore more city</string>
     <string name="see_detail">See Detail</string>
+    <string name="see_all">See All</string>
+    <string name="popular_traveller_post">Popular traveller post</string>
 </resources>
