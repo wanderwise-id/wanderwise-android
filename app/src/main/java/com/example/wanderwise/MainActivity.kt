@@ -20,19 +20,27 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
+                    val intentHome = Intent(this, HomeActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intentHome)
                     overridePendingTransition(0, 0)
                 }
                 R.id.navigation_rank -> {
-                    startActivity(Intent(this, RankActivity::class.java))
+                    val intentRank = Intent(this, RankActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intentRank)
                     overridePendingTransition(0, 0)
                 }
                 R.id.navigation_post -> {
-                    startActivity(Intent(this, PostActivity::class.java))
+                    val intentPost = Intent(this, PostActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intentPost)
                     overridePendingTransition(0, 0)
                 }
                 R.id.navigation_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
+                    val intentProfile = Intent(this, ProfileActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intentProfile)
                     overridePendingTransition(0, 0)
                 }
             }
@@ -40,4 +48,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intentHome = Intent(this, HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intentHome)
+        overridePendingTransition(0, 0)
+    }
 }
