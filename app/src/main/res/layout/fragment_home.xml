@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".HomeActivity">
+    tools:context=".HomeFragment">
 
     <ImageView
         android:id="@+id/imageView"
@@ -60,6 +60,25 @@
         app:layout_constraintBottom_toTopOf="@+id/card_detail_city"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/notif_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/background_notif"
+        android:fontFamily="@font/figtree_medium"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
+        android:text="@string/_33"
+        android:textColor="#ffff"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@+id/notification_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/notification_button"
+        tools:ignore="RtlSymmetry" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_detail_city"
@@ -381,23 +400,5 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
-        app:labelVisibilityMode="labeled"
-        app:itemIconTint="@drawable/navbar_select"
-        app:itemTextAppearanceActive="@style/BottomNavTextStyleIsActive"
-        app:itemTextAppearanceInactive="@style/BottomNavTextStyleIsNonActive"
-        app:backgroundTint="@color/md_theme_light_onTertiary"
-        android:background="?android:attr/windowBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/navigation_bar_menu"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

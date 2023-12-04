@@ -2,59 +2,36 @@ package com.example.wanderwise
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MenuItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.color.MaterialColors
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
+import com.example.wanderwise.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
-        bottomNavigationView.selectedItemId = R.id.navigation_home
+        val navView: BottomNavigationView = binding.navView
 
-        bottomNavigationView.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.navigation_home -> {
-                    val intentHome = Intent(this, HomeActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intentHome)
-                    overridePendingTransition(0, 0)
-                }
-                R.id.navigation_rank -> {
-                    val intentRank = Intent(this, RankActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intentRank)
-                    overridePendingTransition(0, 0)
-                }
-                R.id.navigation_post -> {
-                    val intentPost = Intent(this, PostActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intentPost)
-                    overridePendingTransition(0, 0)
-                }
-                R.id.navigation_profile -> {
-                    val intentProfile = Intent(this, ProfileActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intentProfile)
-                    overridePendingTransition(0, 0)
-                }
-            }
-            true
-        }
+        val navController = findNavController(R.id.nav_host_fragment_activity_main)
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.homeFragment, R.id.postFragment, R.id.rankFragment, R.id.profileFragment
+            )
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        navView.setupWithNavController(navController)
 
         supportActionBar?.hide()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        val intentHome = Intent(this, HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intentHome)
-        overridePendingTransition(0, 0)
     }
 }

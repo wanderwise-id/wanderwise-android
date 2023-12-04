@@ -15,26 +15,23 @@
         <activity
             android:name=".ExploreCityMoreActivity"
             android:exported="false"
-            android:parentActivityName=".HomeActivity"/>
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".NotificationActivity"
             android:exported="false"
-            android:parentActivityName=".HomeActivity" />
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".FavoriteActivity"
             android:exported="false"
-            android:parentActivityName=".HomeActivity" />
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PostActivity"
             android:exported="false" />
         <activity
             android:name=".RankActivity"
             android:exported="false" />
         <activity
-            android:name=".HomeActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,9 +39,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
     </application>
 
 </manifest>
