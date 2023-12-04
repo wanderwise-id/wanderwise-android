@@ -1,5 +1,6 @@
 package com.example.wanderwise
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,7 +19,10 @@ class PostFragment : Fragment() {
         _binding = FragmentPostBinding.inflate(inflater, container, false)
         val view = binding.root
 
-
+        binding.addPost.setOnClickListener {
+            val intentAdd = Intent(activity, AddPostActivity::class.java)
+            startActivity(intentAdd)
+        }
 
         return view
     }

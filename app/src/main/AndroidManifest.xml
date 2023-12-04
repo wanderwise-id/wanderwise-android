@@ -13,6 +13,10 @@
         android:theme="@style/Theme.WanderWise"
         tools:targetApi="31">
         <activity
+            android:name=".AddPostActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".EmergencyActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
@@ -28,12 +32,6 @@
             android:name=".FavoriteActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".ProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RankActivity"
-            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

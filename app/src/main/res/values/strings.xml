@@ -40,4 +40,9 @@
     <string name="jl_mahendradatta_no_57x">Jl. Mahendradatta no 57X</string>
     <string name="bali_med_hospital">Bali Med Hospital</string>
     <string name="_62_361_484748">(+62-361) 484748</string>
+    <string name="select_image">Select image</string>
+    <string name="write_caption">Write caption</string>
+    <string name="pick_city">Pick city</string>
+    <string name="cancel">Cancel</string>
+    <string name="upload">Upload</string>
 </resources>
