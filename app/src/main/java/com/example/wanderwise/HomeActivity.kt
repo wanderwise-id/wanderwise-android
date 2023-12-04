@@ -29,6 +29,12 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intentNotif)
         }
 
+        binding.seeDetailButton.setOnClickListener {
+            val intentExplore = Intent(this, ExploreCityMoreActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intentExplore)
+        }
+
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         bottomNavigationView.selectedItemId = R.id.navigation_home
 
