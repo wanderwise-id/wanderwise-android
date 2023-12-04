@@ -13,9 +13,13 @@
         android:theme="@style/Theme.WanderWise"
         tools:targetApi="31">
         <activity
+            android:name=".EmergencyActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".ExploreCityMoreActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".NotificationActivity"
             android:exported="false"

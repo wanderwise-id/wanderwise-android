@@ -4,16 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AllAndYourPostFragment">
+    tools:context=".HospitalAndPoliceFragment">
+
+    <TextView
+        android:id="@+id/headline_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="23dp"
+        android:layout_marginTop="17dp"
+        android:fontFamily="@font/figtree_regular"
+        android:text="@string/hospital_list"
+        android:textSize="22sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_all_your_post"
+        android:id="@+id/rv_hospital_police"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="17dp"
         android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/headline_list" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

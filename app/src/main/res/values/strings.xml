@@ -34,4 +34,10 @@
     <string name="search_city">Search city</string>
     <string name="monumen_bajra_sandhi">Monumen Bajra Sandhi</string>
     <string name="crime_category">Crime category</string>
+    <string name="hospital">Hospital</string>
+    <string name="police">Police</string>
+    <string name="hospital_list">Hospital list</string>
+    <string name="jl_mahendradatta_no_57x">Jl. Mahendradatta no 57X</string>
+    <string name="bali_med_hospital">Bali Med Hospital</string>
+    <string name="_62_361_484748">(+62-361) 484748</string>
 </resources>

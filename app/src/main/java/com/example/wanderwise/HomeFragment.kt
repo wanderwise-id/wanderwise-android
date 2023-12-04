@@ -33,6 +33,11 @@ class HomeFragment : Fragment() {
             val intentExplore = Intent(activity, ExploreCityMoreActivity::class.java)
             startActivity(intentExplore)
         }
+
+        binding.emergencyButton.setOnClickListener {
+            val intentEmergency = Intent(activity, EmergencyActivity::class.java)
+            startActivity(intentEmergency)
+        }
         return view
     }
 
