@@ -13,6 +13,12 @@
         android:theme="@style/Theme.WanderWise"
         tools:targetApi="31">
         <activity
+            android:name=".DestinationDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NewsDetailCategoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".InformationDetailCityActivity"
             android:exported="false" />
         <activity

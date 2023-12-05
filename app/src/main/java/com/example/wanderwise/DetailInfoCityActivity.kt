@@ -28,7 +28,8 @@ class DetailInfoCityActivity : AppCompatActivity() {
 
                         }
                         2 -> {
-
+                            val intentNews = Intent(this@DetailInfoCityActivity, NewsDetailCategoryActivity::class.java)
+                            startActivity(intentNews)
                         }
                         3 -> {
                             val intentInfo = Intent(this@DetailInfoCityActivity, InformationDetailCityActivity::class.java)
