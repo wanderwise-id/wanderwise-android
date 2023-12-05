@@ -45,4 +45,22 @@
     <string name="pick_city">Pick city</string>
     <string name="cancel">Cancel</string>
     <string name="upload">Upload</string>
+    <string name="live_notification">Live Notification</string>
+    <string name="what_is_denpasar_city">What is Denpasar city?</string>
+    <string name="description_summary_city">Denpasar is the capital city and also the center of government and economy of the province of Bali, Indonesia. Denpasar is the largest city in the Nusa Tenggara Islands and the second largest city in Eastern Indonesia after Makassar City.</string>
+    <string name="destination">Destination</string>
+    <string name="news">News</string>
+    <string name="information">Information</string>
+    <string name="mitigation">Mitigation</string>
+    <string name="safety_score_text_preview">Safety Score</string>
+    <string name="medium">Medium</string>
+    <string name="population">3k ppl/km²</string>
+    <string name="population_text">Population</string>
+    <string name="cost_of_life">Cost of Life</string>
+    <string name="_900rb_month">900rb / month</string>
+    <string name="internet">Internet</string>
+    <string name="internet_speed">Fast 68Mbps (avg)</string>
+    <string name="temperature">Temperature</string>
+    <string name="_33_hospital">33 Hospital</string>
+    <string name="_32_police">32 Police</string>
 </resources>

@@ -38,6 +38,11 @@ class HomeFragment : Fragment() {
             val intentEmergency = Intent(activity, EmergencyActivity::class.java)
             startActivity(intentEmergency)
         }
+
+        binding.cardDetailCity.setOnClickListener {
+            val intentDetailInfo = Intent(activity, DetailInfoCityActivity::class.java)
+            startActivity(intentDetailInfo)
+        }
         return view
     }
 
