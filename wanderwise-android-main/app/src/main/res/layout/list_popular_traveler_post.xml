@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_popular_post"
+        android:layout_width="344dp"
+        android:layout_height="170dp"
+        android:elevation="50dp"
+        app:cardCornerRadius="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/city_preview_post"
+                android:layout_width="112dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="7dp"
+                android:src="@drawable/testing"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/username_popular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="17dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/figtree_semi_bold"
+                android:text="@string/alex_bramartha"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@+id/city_preview_post"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/date_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="17dp"
+                android:fontFamily="@font/figtree_medium"
+                android:text="@string/november_20_2023"
+                android:textSize="11sp"
+                android:textColor="#ADADAD"
+                app:layout_constraintStart_toEndOf="@+id/city_preview_post"
+                app:layout_constraintTop_toBottomOf="@+id/username_popular" />
+
+            <TextView
+                android:id="@+id/description_popular"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="17dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="17dp"
+                android:layout_marginBottom="15dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/figtree_medium"
+                android:maxLines="4"
+                android:text="@string/description_dummy"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/like_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/city_preview_post"
+                app:layout_constraintTop_toBottomOf="@+id/date_post" />
+
+            <ImageView
+                android:id="@+id/like_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="17dp"
+                android:layout_marginBottom="18dp"
+                android:src="@drawable/like_icon_small"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/city_preview_post" />
+
+            <TextView
+                android:id="@+id/like_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/figtree_medium"
+                android:text="@string/_133"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/like_button" />
+
+            <ImageView
+                android:id="@+id/dislike_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="13dp"
+                android:layout_marginBottom="18dp"
+                android:src="@drawable/dislike_icon_small"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/like_amount" />
+
+            <TextView
+                android:id="@+id/dislike_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/figtree_medium"
+                android:text="@string/_33"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/dislike_button" />
+
+            <ImageView
+                android:id="@+id/loc_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="18dp"
+                android:src="@drawable/loc_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/location" />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="65dp"
+                android:layout_height="15dp"
+                android:layout_marginEnd="17dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/figtree_medium"
+                android:text="@string/denpasar"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+    
+</androidx.constraintlayout.widget.ConstraintLayout>

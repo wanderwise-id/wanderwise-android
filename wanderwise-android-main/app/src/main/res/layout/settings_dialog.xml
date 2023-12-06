@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_gravity="center"
+    android:layout_width="300dp"
+    android:layout_height="250dp"
+
+    >
+
+
+    <Button
+        android:id="@+id/btnName2"
+        android:layout_width="284dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/switch1"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="49dp"
+        android:paddingLeft="0dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="4dp"
+        android:backgroundTint="#ffff"
+        android:drawableEnd="@drawable/arrow_icon"
+        android:fontFamily="@font/figtree_medium"
+        android:gravity="left"
+        android:text="Language"
+        android:textColor="#49454f"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="44dp"
+        android:gravity="center"
+        android:text="Settings"
+        android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/dialogButtonOK2"
+        android:layout_width="104dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnName2"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="207dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginRight="5dp"
+        android:backgroundTint="#33EC00"
+        android:textColor="#FFFFFF"
+        android:text="Save" />
+
+    <Button
+        android:id="@+id/dialogButtonOK"
+        android:layout_width="104dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnName2"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginRight="5dp"
+        android:backgroundTint="#EC0000"
+        android:textColor="#FFFFFF"
+        android:text="Cancel" />
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="284dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="49dp"
+        android:layout_marginTop="16dp"
+        android:text="Notification" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/switch1"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="14dp"
+        android:background="#AEAEAE" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@+id/text"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="9dp"
+        app:srcCompat="@drawable/baseline_notifications_24" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/switch1"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="35dp"
+        app:srcCompat="@drawable/baseline_language_24" />
+
+</RelativeLayout>
