@@ -6,7 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentManager
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.example.wanderwise.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -47,13 +48,8 @@ class HomeFragment : Fragment() {
         }
 
         binding.seeAll.setOnClickListener {
-            val fragmentManager = parentFragmentManager
-
-            fragmentManager
-                .beginTransaction()
-                .replace(R.id.nav_host_fragment_activity_main, PostFragment())
-                .addToBackStack(null)
-                .commit()
+            findNavController().popBackStack(R.id.homeFragment, false)
+            findNavController().navigate(R.id.postFragment)
         }
 
         return view

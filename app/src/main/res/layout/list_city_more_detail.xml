@@ -34,6 +34,17 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <ImageView
+                android:id="@+id/love_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="13dp"
+                android:contentDescription="@string/like_icon"
+                android:src="@drawable/love_outline_icon"
+                app:layout_constraintEnd_toEndOf="@+id/city_image"
+                app:layout_constraintTop_toTopOf="@+id/city_image" />
+
             <TextView
                 android:id="@+id/current_loc_text"
                 android:layout_width="wrap_content"
