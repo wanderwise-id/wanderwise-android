@@ -14,6 +14,7 @@ class FirstScreenActivity : AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long) {
 
             }
+
             override fun onFinish() {
                 val intentMain = Intent(this@FirstScreenActivity, LoginScreenActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
