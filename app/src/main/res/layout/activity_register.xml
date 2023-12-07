@@ -65,9 +65,9 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/login_title"
-                app:startIconDrawable="@drawable/baseline_email_24">
+                app:startIconDrawable="@drawable/baseline_person_24">
 
-                <com.example.wanderwise.customview.EmailEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ed_username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
