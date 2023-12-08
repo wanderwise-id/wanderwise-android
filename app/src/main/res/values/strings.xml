@@ -69,7 +69,8 @@
     <string name="wanderwise">WanderWise</string>
     <string name="welcome_traveler">Welcome Traveler</string>
     <string name="login_to_your_account">Login to your account</string>
-
+    <string name="map_parsing">Map gagal dibentuk</string>
+    <string name="map">Tidak bisa mencari gaya map. Error: </string>
     <string name="error_message_email">Masukkan email yang benar!</string>
     <string name="error_message_password">Masukkan password minimal 8 karakter!</string>
     <string name="email">Email</string>

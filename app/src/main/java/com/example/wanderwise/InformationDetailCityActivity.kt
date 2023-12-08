@@ -7,5 +7,7 @@ class InformationDetailCityActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_information_detail_city)
+
+        supportActionBar?.hide()
     }
 }

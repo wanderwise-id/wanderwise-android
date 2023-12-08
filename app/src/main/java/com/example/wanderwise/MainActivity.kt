@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.homeFragment, R.id.postFragment, R.id.rankFragment, R.id.profileFragment
+                R.id.homeFragment, R.id.postFragment, R.id.rankMapsFragment, R.id.profileFragment
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -40,8 +40,8 @@ class MainActivity : AppCompatActivity() {
                     findNavController(R.id.nav_host_fragment_activity_main).navigate(R.id.homeFragment)
                     true
                 }
-                R.id.rankFragment -> {
-                    findNavController(R.id.nav_host_fragment_activity_main).navigate(R.id.rankFragment)
+                R.id.rankMapsFragment -> {
+                    findNavController(R.id.nav_host_fragment_activity_main).navigate(R.id.rankMapsFragment)
                     true
                 }
                 R.id.postFragment -> {
