@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -29,17 +34,17 @@
             android:value="AIzaSyCTQ7taBqc4ZGQYmB_fd7OGwYonSFbFEmM" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name=".ui.post.addpost.MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".ui.register.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginScreenActivity"
+            android:name=".ui.login.LoginScreenActivity"
             android:exported="false" />
         <activity
-            android:name=".FirstScreenActivity"
+            android:name=".ui.splashscreen.FirstScreenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,40 +53,40 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DestinationDetailActivity"
+            android:name=".ui.detailcity.destination.DestinationDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".NewsDetailCategoryActivity"
+            android:name=".ui.detailcity.news.NewsDetailCategoryActivity"
             android:exported="false" />
         <activity
-            android:name=".InformationDetailCityActivity"
+            android:name=".ui.detailcity.information.InformationDetailCityActivity"
             android:exported="false" />
         <activity
-            android:name=".DetailInfoCityActivity"
+            android:name=".ui.detailcity.DetailInfoCityActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".AddPostActivity"
+            android:name=".ui.post.addpost.AddPostActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".EmergencyActivity"
+            android:name=".ui.home.emergency.EmergencyActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".ExploreCityMoreActivity"
+            android:name=".ui.home.morecity.ExploreCityMoreActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".NotificationActivity"
+            android:name=".ui.home.notification.NotificationActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".FavoriteActivity"
+            android:name=".ui.home.favorite.FavoriteActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="false" />
     </application>
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ExploreCityMoreActivity">
+    tools:context=".ui.home.morecity.ExploreCityMoreActivity">
 
     <com.google.android.material.search.SearchBar
         android:layout_width="match_parent"

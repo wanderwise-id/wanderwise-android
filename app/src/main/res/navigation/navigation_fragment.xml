@@ -7,28 +7,28 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.wanderwise.HomeFragment"
+        android:name="com.example.wanderwise.ui.home.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/postFragment"
-        android:name="com.example.wanderwise.PostFragment"
+        android:name="com.example.wanderwise.ui.post.PostFragment"
         android:label="fragment_post"
         tools:layout="@layout/fragment_post" />
     <fragment
         android:id="@+id/rankFragment"
-        android:name="com.example.wanderwise.RankFragment"
+        android:name="com.example.wanderwise.ui.rank.RankFragment"
         android:label="fragment_rank"
         tools:layout="@layout/fragment_rank" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="com.example.wanderwise.ProfileFragment"
+        android:name="com.example.wanderwise.ui.profile.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/rankMapsFragment"
-        android:name="com.example.wanderwise.RankMapsFragment"
+        android:name="com.example.wanderwise.ui.rank.RankMapsFragment"
         android:label="fragment_rank_maps"
         tools:layout="@layout/fragment_rank_maps" />
 </navigation>

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".AddPostActivity">
+    tools:context=".ui.post.addpost.AddPostActivity">
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -41,6 +41,7 @@
                 android:layout_marginStart="23dp"
                 android:layout_marginTop="17dp"
                 android:layout_marginEnd="23dp"
+                android:scaleType="centerCrop"
                 android:background="@drawable/background_image"
                 android:src="@drawable/baseline_image_24"
                 app:layout_constraintEnd_toEndOf="parent"

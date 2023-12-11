@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AllAndYourPostFragment">
+    tools:context=".ui.post.AllAndYourPostFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_all_your_post"

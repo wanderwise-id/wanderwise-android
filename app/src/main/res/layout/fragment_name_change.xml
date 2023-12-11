@@ -8,7 +8,7 @@
     android:padding="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:backgroundTint="@android:color/transparent"
-    tools:context=".NameChangeFragment">
+    tools:context=".ui.profile.smallmenu.NameChangeFragment">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
