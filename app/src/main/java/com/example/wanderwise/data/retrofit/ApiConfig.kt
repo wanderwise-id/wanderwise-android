@@ -16,6 +16,7 @@ object ApiConfig {
 
         val authInterceptor = Interceptor { chain ->
             val req = chain.request()
+            Log.d("tokenCheck", token)
             val requestHeader = req.newBuilder()
                 .addHeader("Authorization", "Bearer $token")
                 .build()
@@ -28,7 +29,7 @@ object ApiConfig {
             .build()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://wander-wise-api-1-7mqffet5fa-as.a.run.app/api/v1/")
+            .baseUrl("https://wander-wise-rest-api-cc-2-7mqffet5fa-as.a.run.app/api/v1/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

@@ -3,8 +3,10 @@ package com.example.wanderwise.ui.login
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import com.example.wanderwise.R
 import com.example.wanderwise.ui.MainActivity
 import com.example.wanderwise.ui.register.RegisterActivity
 import com.example.wanderwise.databinding.ActivityLoginScreenBinding
@@ -33,27 +35,34 @@ class LoginScreenActivity : AppCompatActivity() {
         }
 
         binding.loginButton.setOnClickListener {
-
             val email = binding.edLoginEmail.text.toString()
             val password = binding.edLoginPassword.text.toString()
 
-            loginViewModel.loginUser(email, password).observe(this) { result ->
-                if (result != null) {
-                    when (result) {
-                        is Result.Loading -> {
+            if (email.isEmpty()) {
+                binding.edLoginEmail.error = getString(R.string.cannot_empty)
+            } else if (password.isEmpty()) {
+                binding.edLoginPassword.error = getString(R.string.cannot_empty)
+            } else {
+                loginViewModel.loginUser(email, password).observe(this) { result ->
+                    if (result != null) {
+                        when (result) {
+                            is Result.Loading -> {
+                                isLoading(true)
+                            }
 
-                        }
+                            is Result.Success -> {
+                                showToast(result.data)
+                                isLoading(false)
 
-                        is Result.Success -> {
-                            showToast(result.data)
+                                val intentMain = Intent(this, MainActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY
+                                startActivity(intentMain)
+                            }
 
-                            val intentMain = Intent(this, MainActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY
-                            startActivity(intentMain)
-                        }
-
-                        is Result.Error -> {
-                            showToast(result.error)
+                            is Result.Error -> {
+                                showToast(result.error)
+                                isLoading(false)
+                            }
                         }
                     }
                 }
@@ -71,6 +80,10 @@ class LoginScreenActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun isLoading(loading: Boolean) {
+        binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
     }
 
 }

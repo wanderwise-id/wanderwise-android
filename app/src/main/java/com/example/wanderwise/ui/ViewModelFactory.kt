@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.wanderwise.data.PostRepository
 import com.example.wanderwise.data.response.LoginResponse
 import com.example.wanderwise.di.Injection
+import com.example.wanderwise.ui.home.HomeViewModel
 import com.example.wanderwise.ui.login.LoginViewModel
 import com.example.wanderwise.ui.post.addpost.AddPostActivity
 import com.example.wanderwise.ui.post.addpost.AddPostViewModel
@@ -26,6 +27,8 @@ class ViewModelFactory private constructor(
             return LoginViewModel(pRepository) as T
         } else if (modelClass.isAssignableFrom(ProfileViewModel::class.java)){
             return ProfileViewModel(pRepository) as T
+        } else if (modelClass.isAssignableFrom(HomeViewModel::class.java)){
+            return HomeViewModel(pRepository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel Class: " + modelClass.name)

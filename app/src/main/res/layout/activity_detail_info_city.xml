@@ -55,6 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/city_photo" />
 
     <TextView
+        android:id="@+id/description_summary"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fontFamily="@font/figtree_medium"
@@ -103,7 +104,7 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-    <androidx.viewpager2.widget.ViewPager2
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"

@@ -1,49 +1,41 @@
 package com.example.wanderwise.data.retrofit
 
-import com.example.wanderwise.data.response.CityResponse
 import com.example.wanderwise.data.response.LoginResponse
 import com.example.wanderwise.data.response.RegisterResponse
-import com.example.wanderwise.data.response.TestingUploadResponse
-import com.example.wanderwise.data.response.UploadPostData
+import com.example.wanderwise.data.response.UploadImageResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
-import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
-import java.io.File
 
 interface ApiService {
 
     @Multipart
-    @POST("posts/uploads")
-    fun uploadPost(
-        @Part image: MultipartBody.Part,
-        @Part("title") name: RequestBody,
-        @Part("description") description: RequestBody
-    ): Call<UploadPostData>
-
-    @Multipart
-    @POST("uploadcloud")
-    fun testUpload(
+    @POST("posts")
+    suspend fun uploadImage(
+        @Part("title") title: RequestBody,
+        @Part("caption") caption: RequestBody,
         @Part file: MultipartBody.Part
-    ): Call<TestingUploadResponse>
+    ): UploadImageResponse
 
-    @Multipart
+    @FormUrlEncoded
     @POST("auth/register")
-    fun register(
-        @Part("name") name: RequestBody,
-        @Part("email") email: RequestBody,
-        @Part("password") password: RequestBody
-    ): Call<RegisterResponse>
+    suspend fun register(
+        @Field("username") name: String,
+        @Field("email") email: String,
+        @Field("password") password: String
+    ): RegisterResponse
 
-    @Multipart
+    @FormUrlEncoded
     @POST("auth/login")
     suspend fun login(
-        @Part("email") email: RequestBody,
-        @Part("password") password: RequestBody
+        @Field("email") email: String,
+        @Field("password") password: String
     ): LoginResponse
+
+
 }

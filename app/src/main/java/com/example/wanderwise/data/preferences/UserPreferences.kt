@@ -1,6 +1,7 @@
 package com.example.mystoryapp.data.preferences
 
 import android.content.Context
+import android.net.Uri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -19,6 +20,7 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
         dataStore.edit { preferences ->
             preferences[NAME_KEY] = user.name
             preferences[TOKEN_KEY] = user.token
+            preferences[EMAIL_KEY] = user.email
             preferences[IS_LOGIN_KEY] = true
         }
     }
@@ -28,6 +30,7 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
             UserModel(
                 preferences[NAME_KEY] ?: "",
                 preferences[TOKEN_KEY] ?: "",
+                preferences[EMAIL_KEY] ?: "",
                 preferences[IS_LOGIN_KEY] ?: false
             )
         }
@@ -45,6 +48,7 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
 
         private val NAME_KEY = stringPreferencesKey("name")
         private val TOKEN_KEY = stringPreferencesKey("token")
+        private val EMAIL_KEY = stringPreferencesKey("email")
         private val IS_LOGIN_KEY = booleanPreferencesKey("isLogin")
 
         fun getInstance(dataStore: DataStore<Preferences>): UserPreferences {

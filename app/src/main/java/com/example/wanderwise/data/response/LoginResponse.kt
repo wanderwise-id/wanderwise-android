@@ -7,27 +7,24 @@ data class LoginResponse(
 	@field:SerializedName("msg")
 	val msg: String,
 
-	@field:SerializedName("data")
-	val data: Data,
-
 	@field:SerializedName("error")
 	val error: Boolean,
 
-	@field:SerializedName("token")
-	val token: String
+	@field:SerializedName("body")
+	val body: BodyLogin
 )
 
-data class Data(
+data class BodyLogin(
 
-	@field:SerializedName("user")
-	val user: User
-)
-
-data class User(
+	@field:SerializedName("uid")
+	val uid: String,
 
 	@field:SerializedName("name")
 	val name: String,
 
 	@field:SerializedName("email")
-	val email: String
+	val email: String,
+
+	@field:SerializedName("token")
+	val token: String
 )

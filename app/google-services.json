@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "414349869448",
+    "project_id": "wanderwise-application",
+    "storage_bucket": "wanderwise-application.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414349869448:android:89b7706b437ef8d508fa3d",
+        "android_client_info": {
+          "package_name": "com.example.wanderwise"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMvFYOMGDcOoGmw4UeBC2Zya-4Fvwmr1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
