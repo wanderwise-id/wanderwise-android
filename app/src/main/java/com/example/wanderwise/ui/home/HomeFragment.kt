@@ -150,7 +150,7 @@ class HomeFragment : Fragment() {
         }
         ref.addValueEventListener(cityListener)
 
-        val refInformation = db.getReference("informations")
+        val refInformation = db.getReference("informations/${currentLoc}").limitToLast(1)
         val informations = ArrayList<Information>()
         val infoListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -170,11 +170,9 @@ class HomeFragment : Fragment() {
                 }
 
                 informations.forEach() {
-                    if (it.key == currentLoc) {
-                        binding.destinationsAmount.text = it.numberOfDestinations.toString()
-                        binding.hospitalAmount.text = it.numberOfHospitals.toString()
-                        binding.policeAmount.text = it.numberOfPoliceStations.toString()
-                    }
+                    binding.destinationsAmount.text = it.numberOfDestinations.toString()
+                    binding.hospitalAmount.text = it.numberOfHospitals.toString()
+                    binding.policeAmount.text = it.numberOfPoliceStations.toString()
                 }
             }
 
