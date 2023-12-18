@@ -8,6 +8,7 @@ import com.example.wanderwise.data.response.LoginResponse
 import com.example.wanderwise.di.Injection
 import com.example.wanderwise.ui.home.HomeViewModel
 import com.example.wanderwise.ui.login.LoginViewModel
+import com.example.wanderwise.ui.post.GetPostViewModel
 import com.example.wanderwise.ui.post.addpost.AddPostActivity
 import com.example.wanderwise.ui.post.addpost.AddPostViewModel
 import com.example.wanderwise.ui.profile.ProfileViewModel
@@ -29,6 +30,8 @@ class ViewModelFactory private constructor(
             return ProfileViewModel(pRepository) as T
         } else if (modelClass.isAssignableFrom(HomeViewModel::class.java)){
             return HomeViewModel(pRepository) as T
+        } else if (modelClass.isAssignableFrom(GetPostViewModel::class.java)){
+            return GetPostViewModel(pRepository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel Class: " + modelClass.name)

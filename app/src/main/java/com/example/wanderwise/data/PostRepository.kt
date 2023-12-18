@@ -9,6 +9,7 @@ import androidx.lifecycle.liveData
 import com.example.mystoryapp.data.preferences.UserPreferences
 import com.example.wanderwise.R
 import com.example.wanderwise.data.preferences.UserModel
+import com.example.wanderwise.data.response.GetAllPostResponse
 import com.example.wanderwise.data.response.LoginResponse
 import com.example.wanderwise.data.response.RegisterResponse
 import com.example.wanderwise.data.response.UploadImageResponse
@@ -25,7 +26,10 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.HttpException
+import retrofit2.Response
 import java.io.File
 
 class PostRepository private constructor
@@ -35,6 +39,73 @@ class PostRepository private constructor
     private val preferences: UserPreferences
 ){
 
+    private val _allPost = MutableLiveData<ArrayList<GetAllPostResponse>>()
+    val allPost: LiveData<ArrayList<GetAllPostResponse>> = _allPost
+
+    private val _userPost = MutableLiveData<ArrayList<GetAllPostResponse>>()
+    val userPost: LiveData<ArrayList<GetAllPostResponse>> = _userPost
+
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _snackBarText = MutableLiveData<Event<String>>()
+    val snackBarText: LiveData<Event<String>> = _snackBarText
+
+    fun getAllPost() {
+        _isLoading.value = true
+        val user = runBlocking { preferences.getSession().first() }
+        val client = ApiConfig.getApiService(user.token).getAllPost()
+        client.enqueue(object : Callback<ArrayList<GetAllPostResponse>> {
+            override fun onResponse(
+                call: Call<ArrayList<GetAllPostResponse>>,
+                response: Response<ArrayList<GetAllPostResponse>>
+            ) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    _isLoading.value = false
+                    _allPost.value = response.body()
+                    Log.d("TestingKesamaan", "Ini onResponse ${response.body()}")
+                } else {
+                    _isLoading.value = true
+                    _snackBarText.value = Event("API request failed with code: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ArrayList<GetAllPostResponse>>, t: Throwable) {
+                _isLoading.value = true
+                Log.d("TestingKesamaan", "Ini onFailure ${t.message}")
+                _snackBarText.value = Event("OnFailure: ${t.message}")
+            }
+        })
+    }
+
+    fun getUserPost() {
+        _isLoading.value = true
+        val user = runBlocking { preferences.getSession().first() }
+        val client = ApiConfig.getApiService(user.token).getUserPost()
+        client.enqueue(object : Callback<ArrayList<GetAllPostResponse>> {
+            override fun onResponse(
+                call: Call<ArrayList<GetAllPostResponse>>,
+                response: Response<ArrayList<GetAllPostResponse>>
+            ) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    _isLoading.value = false
+                    _userPost.value = response.body()
+                } else {
+                    _isLoading.value = true
+                    _snackBarText.value = Event("API request failed with code: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ArrayList<GetAllPostResponse>>, t: Throwable) {
+                _isLoading.value = true
+                Log.d("TestingKesamaan", "Ini onResponse ${t.message}")
+                _snackBarText.value = Event("OnFailure: ${t.message}")
+            }
+        })
+    }
+
     fun uploadImage(title: String, caption: String, image: File) = liveData {
         emit(Result.Loading)
 
@@ -43,7 +114,7 @@ class PostRepository private constructor
             val captionRequestBody = caption.toRequestBody("plain/text".toMediaType())
             val requestImageFile = image.asRequestBody("image/*".toMediaTypeOrNull())
             val multipartBody = MultipartBody.Part.createFormData(
-                "file",
+                "image",
                 image.name,
                 requestImageFile
             )
