@@ -72,7 +72,6 @@ class NewsFragment : Fragment() {
         }
         ref.addValueEventListener(newsAmountListener)
 
-        // Inflate the layout for this fragment
         return view
     }
 

@@ -24,6 +24,7 @@ import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
 import com.example.wanderwise.data.database.Information
 import com.example.wanderwise.data.database.Score
+import com.example.wanderwise.data.database.ScoreCurrent
 import com.example.wanderwise.data.database.Weather
 import com.example.wanderwise.databinding.FragmentHomeBinding
 import com.example.wanderwise.ui.ViewModelFactory
@@ -51,7 +52,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val view = binding.root
 
         binding.favoriteButton.setOnClickListener {
             val intentFavorite = Intent(activity, FavoriteActivity::class.java)
@@ -101,6 +101,8 @@ class HomeFragment : Fragment() {
                     )
                 }
 
+                val scoreLast: MutableMap<String, Score> = mutableMapOf()
+
                 cities.forEach() {
                     if (it.key == currentLoc) {
                         binding.locationName.text = it.key.toString()
@@ -109,6 +111,36 @@ class HomeFragment : Fragment() {
                             .transform(CenterCrop(), RoundedCorners(40))
                             .into(binding.cityImage)
                     }
+
+                    val cityScoreRef = db.getReference("scores/${it.key}")
+                    val scores = ArrayList<Score>()
+                    val scoreListener = object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                            dataSnapshot.children.map { dataSnapshotScore ->
+                                scores.add(
+                                    Score(
+                                        dataSnapshotScore.key,
+                                        dataSnapshotScore.getValue<Score>()!!.dateTime,
+                                        dataSnapshotScore.getValue<Score>()!!.description,
+                                        dataSnapshotScore.getValue<Score>()!!.score
+                                    )
+                                )
+                            }
+                            Log.d("TestingScoreCity", "${it.key.toString()} $scores")
+                            scoreLast[it.key.toString()] = if (scores.isNotEmpty()) scores[scores.size - 1] else Score()
+
+                            cityAdapter = CityExploreAdapter(requireContext(), cities, scoreLast)
+                            binding.exploreCityRv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                            binding.exploreCityRv.setHasFixedSize(true)
+                            binding.exploreCityRv.adapter = cityAdapter
+                        }
+
+                        override fun onCancelled(databaseError: DatabaseError) {
+                            Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+                        }
+                    }
+                    cityScoreRef.addValueEventListener(scoreListener)
                 }
             }
 
@@ -193,51 +225,43 @@ class HomeFragment : Fragment() {
         }
         refWeathers.addValueEventListener(weatherListener)
 
-        val refScores = db.getReference("scores")
-        val scores = ArrayList<Score>()
-        val scoreListener = object : ValueEventListener {
+        val refScores = db.getReference("scores/$currentLoc")
+        val scoreCurrent = ArrayList<ScoreCurrent>()
+        val scoreCurrentListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
 
                 dataSnapshot.children.map {
-                    scores.add(
-                        Score(
+                    scoreCurrent.add(
+                        ScoreCurrent(
                             it.key,
-                            it.getValue<Score>()!!.dateTime,
-                            it.getValue<Score>()!!.description,
-                            it.getValue<Score>()!!.score
+                            it.getValue<ScoreCurrent>()!!.dateTime,
+                            it.getValue<ScoreCurrent>()!!.description,
+                            it.getValue<ScoreCurrent>()!!.score
                         )
                     )
                 }
 
-                scores.forEach() {
-                    if (it.key == currentLoc) {
-                        Log.d("SafetyScore", "${it.score}")
-                        homeViewModel.safetyScore = it.score
+                scoreCurrent.forEach() {
+                    homeViewModel.safetyScore = it.score
 
-                        if (it.score.toString().toInt() <= 33) {
-                            binding.safetyLevelText.text = getString(R.string.danger)
-                            binding.safetyIcon.setImageResource(R.drawable.danger_icon_small)
-                        } else if (it.score.toString().toInt() <= 70) {
-                            binding.safetyLevelText.text = getString(R.string.warning)
-                            binding.safetyIcon.setImageResource(R.drawable.warning_icon_small)
-                        } else if (it.score.toString().toInt() <= 100) {
-                            binding.safetyLevelText.text = getString(R.string.safe)
-                            binding.safetyIcon.setImageResource(R.drawable.safe_icon_small)
-                        }
+                    if (it.score.toString().toDouble() <= 33) {
+                        binding.safetyLevelText.text = getString(R.string.danger)
+                        binding.safetyIcon.setImageResource(R.drawable.danger_icon_small)
+                    } else if (it.score.toString().toDouble() <= 70) {
+                        binding.safetyLevelText.text = getString(R.string.warning)
+                        binding.safetyIcon.setImageResource(R.drawable.warning_icon_small)
+                    } else if (it.score.toString().toDouble() <= 100) {
+                        binding.safetyLevelText.text = getString(R.string.safe)
+                        binding.safetyIcon.setImageResource(R.drawable.safe_icon_small)
                     }
                 }
-
-                cityAdapter = CityExploreAdapter(requireContext(), cities, scores)
-                binding.exploreCityRv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-                binding.exploreCityRv.setHasFixedSize(true)
-                binding.exploreCityRv.adapter = cityAdapter
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
             }
         }
-        refScores.addValueEventListener(scoreListener)
+        refScores.addValueEventListener(scoreCurrentListener)
 
         binding.seeAll.setOnClickListener {
             findNavController().popBackStack(R.id.homeFragment, false)
@@ -248,7 +272,7 @@ class HomeFragment : Fragment() {
             binding.usernameUser.text = it.name
         }
 
-        return view
+        return binding.root
     }
 
     override fun onDestroyView() {

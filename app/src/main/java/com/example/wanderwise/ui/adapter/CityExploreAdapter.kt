@@ -24,7 +24,7 @@ import com.example.wanderwise.ui.detailcity.DetailInfoCityActivity
 class CityExploreAdapter(
     private val context: Context,
     private val cities: ArrayList<City>,
-    private val scores: ArrayList<Score>
+    private val scores: MutableMap<String, Score>
 ) : RecyclerView.Adapter<CityExploreAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -37,8 +37,8 @@ class CityExploreAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val city = cities[position]
-        val score = scores[position]
-        holder.bind(context, score, city)
+
+        holder.bind(context, scores, city)
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, DetailInfoCityActivity::class.java)
@@ -52,8 +52,9 @@ class CityExploreAdapter(
     }
 
     class MyViewHolder(val binding: ListExploreCityBinding) : RecyclerView.ViewHolder(binding.root) {
+
         @SuppressLint("SetTextI18n")
-        fun bind(context: Context, score: Score, city: City) {
+        fun bind(context: Context, scores: MutableMap<String, Score>, city: City) {
 
             Glide.with(binding.root)
                 .load(city.image)
@@ -61,16 +62,23 @@ class CityExploreAdapter(
 
             binding.cityName.text = city.key.toString()
 
-            if (city.key == score.key) {
-                if (score.score.toString().toInt() <= 33) {
-                    binding.safetyLevel.text = context.getString(R.string.danger)
-                    binding.iconSafetyMedium.setImageResource(R.drawable.danger_icon_medium)
-                } else if (score.score.toString().toInt() <= 70) {
-                    binding.safetyLevel.text = context.getString(R.string.warning)
-                    binding.iconSafetyMedium.setImageResource(R.drawable.warning_icon_medium)
-                } else if (score.score.toString().toInt() <= 100) {
+            val scoreCity = scores[city.key.toString()]?.score
+            Log.d("TestingScoreCityAdapter", "${city.key.toString()} $scoreCity")
+            if (scoreCity == null) {
+                binding.safetyLevel.text = "Undefined"
+                binding.iconSafetyMedium.setImageResource(R.drawable.warning_icon_medium)
+            } else {
+                if (scoreCity.toString().toDouble() <= 100) {
                     binding.safetyLevel.text = context.getString(R.string.safe)
                     binding.iconSafetyMedium.setImageResource(R.drawable.safe_icon_medium)
+                }
+                if (scoreCity.toString().toDouble() <= 70) {
+                    binding.safetyLevel.text = context.getString(R.string.warning)
+                    binding.iconSafetyMedium.setImageResource(R.drawable.warning_icon_medium)
+                }
+                if (scoreCity.toString().toDouble() <= 33) {
+                    binding.safetyLevel.text = context.getString(R.string.danger)
+                    binding.iconSafetyMedium.setImageResource(R.drawable.danger_icon_medium)
                 }
             }
         }
