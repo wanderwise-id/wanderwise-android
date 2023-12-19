@@ -20,31 +20,31 @@ data class GetAllPostResponse(
 data class PostsItem(
 
 	@field:SerializedName("image")
-	val image: String,
+	val image: Any? = null,
 
 	@field:SerializedName("createdAt")
-	val createdAt: CreatedAt,
+	val createdAt: CreatedAt = CreatedAt(),
 
 	@field:SerializedName("caption")
-	val caption: String,
+	val caption: Any? = null,
 
 	@field:SerializedName("id")
-	val id: String,
+	val id: Any? = null,
 
 	@field:SerializedName("title")
-	val title: String,
+	val title: Any? = null,
 
 	@field:SerializedName("idPost")
-	val idPost: String
+	val idPost: Any? = null
 )
 
 data class CreatedAt(
 
 	@field:SerializedName("_nanoseconds")
-	val nanoseconds: Int,
+	val nanoseconds: Any =0,
 
 	@field:SerializedName("_seconds")
-	val seconds: Int
+	val seconds: Any = 0
 )
 
 data class BodyPostUser(

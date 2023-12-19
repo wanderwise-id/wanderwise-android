@@ -8,23 +8,26 @@ import androidx.lifecycle.viewModelScope
 import com.example.wanderwise.data.PostRepository
 import com.example.wanderwise.data.preferences.UserModel
 import com.example.wanderwise.data.response.GetAllPostResponse
+import com.example.wanderwise.data.response.PostsItem
 import com.example.wanderwise.utils.Event
 import kotlinx.coroutines.launch
 
 class GetPostViewModel(private val pRepository: PostRepository): ViewModel() {
 
-    val snackbar: LiveData<Event<String>> = pRepository.snackBarText
+    val uid = pRepository.userUid
 
-    val isLoading: LiveData<Boolean> = pRepository.isLoading
-
-    val allPost: LiveData<ArrayList<GetAllPostResponse>> = pRepository.allPost
-    val allUser: LiveData<ArrayList<GetAllPostResponse>> = pRepository.userPost
-
-    fun getAllPosts() {
-        pRepository.getAllPost()
-    }
-
-    fun getUserPost() {
-        pRepository.getUserPost()
-    }
+//    val snackbar: LiveData<Event<String>> = pRepository.snackBarText
+//
+//    val isLoading: LiveData<Boolean> = pRepository.isLoading
+//
+//    val allPost = pRepository.allPost
+//    val allUser = pRepository.userPost
+//
+//    fun getAllPosts() {
+//        pRepository.getAllPost()
+//    }
+//
+//    fun getUserPost() {
+//        pRepository.getUserPost()
+//    }
 }

@@ -39,10 +39,10 @@ interface ApiService {
         @Field("password") password: String
     ): LoginResponse
 
-    @GET("posts/home")
-    fun getAllPost(): Call<ArrayList<GetAllPostResponse>>
-
-    @GET("posts")
-    fun getUserPost(): Call<ArrayList<GetAllPostResponse>>
+//    @GET("posts/home")
+//    fun getAllPost(): Call<List<GetAllPostResponse>>
+//
+//    @GET("posts")
+//    fun getUserPost(): Call<List<GetAllPostResponse>>
 
 }

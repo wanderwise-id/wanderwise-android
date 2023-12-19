@@ -38,73 +38,76 @@ class PostRepository private constructor
     private val apiService: ApiService,
     private val preferences: UserPreferences
 ){
+    val user = runBlocking { preferences.getSession().first() }
+    val userUid = user.uid
 
-    private val _allPost = MutableLiveData<ArrayList<GetAllPostResponse>>()
-    val allPost: LiveData<ArrayList<GetAllPostResponse>> = _allPost
-
-    private val _userPost = MutableLiveData<ArrayList<GetAllPostResponse>>()
-    val userPost: LiveData<ArrayList<GetAllPostResponse>> = _userPost
-
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
-
-    private val _snackBarText = MutableLiveData<Event<String>>()
-    val snackBarText: LiveData<Event<String>> = _snackBarText
-
-    fun getAllPost() {
-        _isLoading.value = true
-        val user = runBlocking { preferences.getSession().first() }
-        val client = ApiConfig.getApiService(user.token).getAllPost()
-        client.enqueue(object : Callback<ArrayList<GetAllPostResponse>> {
-            override fun onResponse(
-                call: Call<ArrayList<GetAllPostResponse>>,
-                response: Response<ArrayList<GetAllPostResponse>>
-            ) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    _isLoading.value = false
-                    _allPost.value = response.body()
-                    Log.d("TestingKesamaan", "Ini onResponse ${response.body()}")
-                } else {
-                    _isLoading.value = true
-                    _snackBarText.value = Event("API request failed with code: ${response.code()}")
-                }
-            }
-
-            override fun onFailure(call: Call<ArrayList<GetAllPostResponse>>, t: Throwable) {
-                _isLoading.value = true
-                Log.d("TestingKesamaan", "Ini onFailure ${t.message}")
-                _snackBarText.value = Event("OnFailure: ${t.message}")
-            }
-        })
-    }
-
-    fun getUserPost() {
-        _isLoading.value = true
-        val user = runBlocking { preferences.getSession().first() }
-        val client = ApiConfig.getApiService(user.token).getUserPost()
-        client.enqueue(object : Callback<ArrayList<GetAllPostResponse>> {
-            override fun onResponse(
-                call: Call<ArrayList<GetAllPostResponse>>,
-                response: Response<ArrayList<GetAllPostResponse>>
-            ) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    _isLoading.value = false
-                    _userPost.value = response.body()
-                } else {
-                    _isLoading.value = true
-                    _snackBarText.value = Event("API request failed with code: ${response.code()}")
-                }
-            }
-
-            override fun onFailure(call: Call<ArrayList<GetAllPostResponse>>, t: Throwable) {
-                _isLoading.value = true
-                Log.d("TestingKesamaan", "Ini onResponse ${t.message}")
-                _snackBarText.value = Event("OnFailure: ${t.message}")
-            }
-        })
-    }
+//    private val _allPost = MutableLiveData<List<GetAllPostResponse>>()
+//    val allPost: LiveData<List<GetAllPostResponse>> = _allPost
+//
+//    private val _userPost = MutableLiveData<List<GetAllPostResponse>>()
+//    val userPost: LiveData<List<GetAllPostResponse>> = _userPost
+//
+//    private val _isLoading = MutableLiveData<Boolean>()
+//    val isLoading: LiveData<Boolean> = _isLoading
+//
+//    private val _snackBarText = MutableLiveData<Event<String>>()
+//    val snackBarText: LiveData<Event<String>> = _snackBarText
+//
+//    fun getAllPost() {
+//        _isLoading.value = true
+//        val user = runBlocking { preferences.getSession().first() }
+//        val client = ApiConfig.getApiService(user.token).getAllPost()
+//        client.enqueue(object : Callback<List<GetAllPostResponse>> {
+//            override fun onResponse(
+//                call: Call<List<GetAllPostResponse>>,
+//                response: Response<List<GetAllPostResponse>>
+//            ) {
+//                _isLoading.value = false
+//                if (response.isSuccessful) {
+//                    _isLoading.value = false
+//                    _allPost.value = response.body()
+//                    Log.d("TestingKesamaan", "Ini onResponse ${response.body()}")
+//                } else {
+//                    _isLoading.value = true
+//                    _snackBarText.value = Event("API request failed with code: ${response.code()}")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<List<GetAllPostResponse>>, t: Throwable) {
+//                _isLoading.value = true
+//                Log.d("TestingKesamaan", "Ini onFailure ${t.message}")
+//                _snackBarText.value = Event("OnFailure: ${t.message}")
+//            }
+//        })
+//    }
+//
+//    fun getUserPost() {
+//        _isLoading.value = true
+//        val user = runBlocking { preferences.getSession().first() }
+//        val client = ApiConfig.getApiService(user.token).getUserPost()
+//        client.enqueue(object : Callback<List<GetAllPostResponse>> {
+//            override fun onResponse(
+//                call: Call<List<GetAllPostResponse>>,
+//                response: Response<List<GetAllPostResponse>>
+//            ) {
+//                _isLoading.value = false
+//                if (response.isSuccessful) {
+//                    _isLoading.value = false
+//                    _userPost.value = response.body()
+//                    Log.d("TestingKesamaan", "Ini onResponse ${response.body()}")
+//                } else {
+//                    _isLoading.value = true
+//                    _snackBarText.value = Event("API request failed with code: ${response.code()}")
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<List<GetAllPostResponse>>, t: Throwable) {
+//                _isLoading.value = true
+//                Log.d("TestingKesamaan", "Ini OnFailure ${t.message}")
+//                _snackBarText.value = Event("OnFailure: ${t.message}")
+//            }
+//        })
+//    }
 
     fun uploadImage(title: String, caption: String, image: File) = liveData {
         emit(Result.Loading)
@@ -154,9 +157,10 @@ class PostRepository private constructor
             val name = successResponse.body.name
             val token = successResponse.body.token
             val emailUser = successResponse.body.email
+            val uidUser = successResponse.body.uid
             val isLogin = true
             Log.d("tokenCheck", token)
-            saveSession(UserModel(name, token, emailUser, isLogin))
+            saveSession(UserModel(name, token, emailUser, uidUser, isLogin))
             emit(Result.Success("Thanks ${successResponse.body.name} for the Login!"))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

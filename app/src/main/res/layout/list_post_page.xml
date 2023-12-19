@@ -8,8 +8,9 @@
     <androidx.cardview.widget.CardView
         android:layout_width="344dp"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="20dp"
+        android:layout_marginTop="24dp"
         android:elevation="50dp"
+        app:cardCornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,8 +23,8 @@
                 android:id="@+id/post_image_preview"
                 android:layout_width="match_parent"
                 android:layout_height="344dp"
-                android:src="@drawable/testing"
                 android:scaleType="centerCrop"
+                android:src="@drawable/testing"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -72,8 +73,8 @@
                 android:layout_marginEnd="18dp"
                 android:layout_marginBottom="15dp"
                 android:fontFamily="@font/figtree_medium"
-                android:textSize="12sp"
                 android:text="@string/description_dummy"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toTopOf="@+id/like_button_post"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

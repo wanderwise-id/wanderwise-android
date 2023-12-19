@@ -13,7 +13,7 @@ import com.example.wanderwise.data.response.GetAllPostResponse
 import com.example.wanderwise.ui.post.addpost.AddPostActivity
 import com.example.wanderwise.databinding.FragmentPostBinding
 import com.example.wanderwise.ui.ViewModelFactory
-import com.example.wanderwise.ui.adapter.PostAdapter
+//import com.example.wanderwise.ui.adapter.PostAdapter
 import com.example.wanderwise.ui.adapter.PostPagerAdapter
 import com.example.wanderwise.ui.home.HomeViewModel
 import com.google.android.material.tabs.TabLayoutMediator
@@ -26,7 +26,7 @@ class PostFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentPostBinding.inflate(inflater, container, false)
         val view = binding.root
 
