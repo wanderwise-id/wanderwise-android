@@ -1,7 +1,5 @@
 package com.example.wanderwise.ui.detailcity
 
-import android.app.Activity
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
@@ -9,21 +7,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.fragment.app.viewModels
-import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
-import com.example.wanderwise.ui.detailcity.information.InformationDetailCityActivity
-import com.example.wanderwise.ui.detailcity.news.NewsDetailCategoryActivity
 import com.example.wanderwise.databinding.ActivityDetailInfoCityBinding
 import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.ui.adapter.SectionPagerAdapter
 import com.example.wanderwise.ui.home.HomeViewModel
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -34,6 +24,7 @@ class DetailInfoCityActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailInfoCityBinding
     private var cityKey: String? = null
+    private var keyCity: String? = null
     private val homeViewModel by viewModels<HomeViewModel> {
         ViewModelFactory.getInstance(this)
     }
@@ -44,6 +35,9 @@ class DetailInfoCityActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         cityKey = intent.getStringExtra(CITY)
+
+        keyCity = intent.getStringExtra(KEY_CITY)
+
         homeViewModel.locationData = cityKey
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
@@ -68,8 +62,18 @@ class DetailInfoCityActivity : AppCompatActivity() {
                 }
 
                 cities.forEach() {
-                    if (it.key == cityKey) {
+                    if (it.key == keyCity) {
                         val titleCity = it.key.toString()
+
+                        val formattedTitle = getString(R.string.what_is_denpasar_city, titleCity)
+                        binding.titleCity.text = formattedTitle
+                        Glide.with(binding.root)
+                            .load(it.image)
+                            .into(binding.cityPhoto)
+                        binding.descriptionSummary.text = it.description.toString()
+                    } else if (it.key == cityKey) {
+                        val titleCity = it.key.toString()
+
                         val formattedTitle = getString(R.string.what_is_denpasar_city, titleCity)
                         binding.titleCity.text = formattedTitle
                         Glide.with(binding.root)
@@ -105,5 +109,6 @@ class DetailInfoCityActivity : AppCompatActivity() {
 
     companion object {
         const val CITY = "city"
+        const val KEY_CITY = "key"
     }
 }

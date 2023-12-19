@@ -37,13 +37,14 @@ class DestinationFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentDestinationBinding.inflate(inflater, container, false)
         val view = binding.root
 
         homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
 
         val cityKey = homeViewModel.locationData
+        Log.d("IsiLokasiData", "$cityKey")
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
         val ref = db.getReference("destinations/${cityKey}")

@@ -17,7 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WanderWise"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ui.detailcity.news.CrimeCategoryDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.detailcity.DetailInfoCityActivity"/>
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -54,9 +57,6 @@
         </activity>
         <activity
             android:name=".ui.detailcity.destination.DestinationDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.detailcity.news.NewsDetailCategoryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.detailcity.information.InformationDetailCityActivity"

@@ -14,4 +14,6 @@ class HomeViewModel (private val pRepository: PostRepository): ViewModel() {
 
     var locationData: String? = ""
     var safetyScore: Any? = null
+
+    var detailLocation: String? = ""
 }
