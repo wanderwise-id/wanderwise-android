@@ -1,5 +1,6 @@
 package com.example.wanderwise.ui.detailcity
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ import com.example.wanderwise.data.database.News
 import com.example.wanderwise.databinding.FragmentDestinationBinding
 import com.example.wanderwise.databinding.FragmentNewsBinding
 import com.example.wanderwise.ui.adapter.DestinationAdapter
+import com.example.wanderwise.ui.detailcity.news.CrimeCategoryDetailActivity
 import com.example.wanderwise.ui.home.HomeViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -30,6 +32,7 @@ class NewsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var homeViewModel: HomeViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,7 +65,8 @@ class NewsFragment : Fragment() {
                 binding.notifAmount.text = newsAmount.size.toString()
 
                 binding.crimeCard.setOnClickListener {
-
+                    val intentCrimeNews = Intent(activity, CrimeCategoryDetailActivity::class.java)
+                    startActivity(intentCrimeNews)
                 }
             }
 

@@ -75,9 +75,11 @@ class HomeFragment : Fragment() {
             startActivity(intentEmergency)
         }
 
+        homeViewModel.locationData = currentLoc
         binding.cardDetailCity.setOnClickListener {
-            val intentDetailInfo = Intent(activity, DetailInfoCityActivity::class.java)
-            startActivity(intentDetailInfo)
+            val intent = Intent(activity, DetailInfoCityActivity::class.java)
+            intent.putExtra(DetailInfoCityActivity.KEY_CITY, currentLoc)
+            startActivity(intent)
         }
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
