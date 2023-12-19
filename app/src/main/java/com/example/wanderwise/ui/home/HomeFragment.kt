@@ -52,6 +52,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val currentLoc = "Denpasar"
 
         binding.favoriteButton.setOnClickListener {
             val intentFavorite = Intent(activity, FavoriteActivity::class.java)
@@ -60,6 +61,7 @@ class HomeFragment : Fragment() {
 
         binding.notificationButton.setOnClickListener {
             val intentNotif = Intent(activity, NotificationActivity::class.java)
+            intentNotif.putExtra("cityKey", currentLoc)
             startActivity(intentNotif)
         }
 
@@ -77,8 +79,6 @@ class HomeFragment : Fragment() {
             val intentDetailInfo = Intent(activity, DetailInfoCityActivity::class.java)
             startActivity(intentDetailInfo)
         }
-
-        val currentLoc = "Denpasar"
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
