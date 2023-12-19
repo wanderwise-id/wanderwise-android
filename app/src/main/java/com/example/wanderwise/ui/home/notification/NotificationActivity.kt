@@ -37,7 +37,7 @@ class NotificationActivity : AppCompatActivity() {
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
         val currentTime = System.currentTimeMillis()
         val oneDayAgo = currentTime - (24 * 60 * 60 * 1000)
-        val refNotification = db.getReference("notifications/${cityKey}")//.orderByChild("timestamp").startAt(oneDayAgo.toString().toDouble())
+        val refNotification = db.getReference("notifications/${cityKey}").orderByChild("timestamp").startAt(oneDayAgo.toString().toDouble())
         val notificationListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val notifications = ArrayList<Notification>()
