@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wanderwise.R
 import com.example.wanderwise.data.response.CreatedAt
@@ -22,6 +23,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class AllAndYourPostFragment : Fragment() {
 
@@ -55,11 +58,10 @@ class AllAndYourPostFragment : Fragment() {
                 val userAllPosts = ArrayList<PostsItem>()
                 showLoading(true)
 
-                db.collection("posts")
-                    .get()
-                    .addOnSuccessListener {
-                        it.documents.forEach() { doc ->
-
+                try {
+                    lifecycleScope.launch {
+                        val postSnapshot = db.collection("posts").get().await()
+                        postSnapshot.documents.forEach() { doc ->
                             userAllPosts.add(
                                 PostsItem(
                                     image = doc.getString("image"),
@@ -83,15 +85,18 @@ class AllAndYourPostFragment : Fragment() {
                         binding.rvAllYourPost.setHasFixedSize(true)
                         binding.rvAllYourPost.adapter = adapterUserPost
                     }
+                } catch (e: Exception) {
+                    Log.e("Error", "Failed to fetch data: ${e.message}")
+                }
             } else {
                 val userPosts = ArrayList<PostsItem>()
                 showLoading(true)
 
-                db.collection("posts").whereEqualTo("userId", uidUser)
-                    .get()
-                    .addOnSuccessListener {
-                        it.documents.forEach() {doc ->
+                try {
+                    lifecycleScope.launch {
+                        val postSnapshot = db.collection("posts").whereEqualTo("userId", uidUser).get().await()
 
+                        postSnapshot.documents.forEach() {doc ->
                             userPosts.add(
                                 PostsItem(
                                     image = doc.getString("image"),
@@ -115,9 +120,11 @@ class AllAndYourPostFragment : Fragment() {
                         binding.rvAllYourPost.setHasFixedSize(true)
                         binding.rvAllYourPost.adapter = adapterUserPost
                     }
+                } catch (e: Exception) {
+                    Log.e("Error", "Failed to fetch data: ${e.message}")
+                }
             }
         }
-
 
         return view
     }
