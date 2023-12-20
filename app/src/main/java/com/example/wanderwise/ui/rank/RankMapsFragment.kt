@@ -68,23 +68,28 @@ class RankMapsFragment : Fragment() {
                             boundsBuilder.include(latLng)
 
                             val cityKey = citySnapshot.key
-                            val scoreLast: MutableMap<String, Double> = mutableMapOf() // Menggunakan Double sebagai tipe datanya
+                            val scoreLast: MutableMap<String, Int> = mutableMapOf() // Menggunakan Double sebagai tipe datanya
 
-                            refScores.child(cityKey.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
+                            refScores.child(cityKey.toString()).limitToLast(1).addListenerForSingleValueEvent(object : ValueEventListener {
                                 override fun onDataChange(scoreSnapshot: DataSnapshot) {
-                                    val score = scoreSnapshot.getValue<Score>()
-                                    if (score != null) {
-                                        scoreLast[cityKey.toString()] = score.score.toString().toDouble()
-                                    }
+                                    if (scoreSnapshot.childrenCount > 0){
+                                        scoreSnapshot.children.forEach{
+                                            if(it.getValue<Score>()!!.score != null){
+                                                scoreLast[cityKey.toString()] = it.getValue<Score>()!!.score.toString().toDouble().toInt()
+                                            } else{
+                                                scoreLast[cityKey.toString()] = 0
+                                            }
+                                        }
 
-                                    mMap.addMarker(
-                                        MarkerOptions()
-                                            .position(latLng)
-                                            .title(citySnapshot.key)
-                                            .snippet(scoreLast[cityKey.toString()].toString()) // Menggunakan nilai skor di sini
-                                    ).also { marker ->
-                                        if (marker != null) {
-                                            marker.tag = citySnapshot.key
+                                        mMap.addMarker(
+                                            MarkerOptions()
+                                                .position(latLng)
+                                                .title(citySnapshot.key)
+                                                .snippet(scoreLast[cityKey.toString()].toString()) // Menggunakan nilai skor di sini
+                                        ).also { marker ->
+                                            if (marker != null) {
+                                                marker.tag = citySnapshot.key
+                                            }
                                         }
                                     }
                                 }
