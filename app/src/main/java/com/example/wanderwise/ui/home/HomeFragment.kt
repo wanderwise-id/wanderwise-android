@@ -8,10 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -32,9 +30,7 @@ import com.example.wanderwise.data.response.PostsItem
 import com.example.wanderwise.databinding.FragmentHomeBinding
 import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.ui.adapter.CityExploreAdapter
-import com.example.wanderwise.ui.adapter.PostAdapter
 import com.example.wanderwise.ui.adapter.PostHomeAdapter
-import com.example.wanderwise.ui.detailcity.DestinationFragment
 import com.example.wanderwise.utils.MyLocation
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
@@ -67,6 +63,8 @@ class HomeFragment : Fragment() {
 
         var currentLoc = ""
 
+        val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
+
         homeViewModel.getSessionUser().observe(viewLifecycleOwner) { cityUser ->
 
             homeViewModel.editUserModel(UserModel(
@@ -81,136 +79,25 @@ class HomeFragment : Fragment() {
 
             currentLoc = cityUser.userLocation
 
-            val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
-
-            val ref = db.getReference("cities")
-            val cities = ArrayList<City>()
-            val cityListener = object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                    dataSnapshot.children.map {
-                        cities.add(
-                            City(
-                                it.key,
-                                it.getValue<City>()!!.area,
-                                it.getValue<City>()!!.capital,
-                                it.getValue<City>()!!.country,
-                                it.getValue<City>()!!.description,
-                                it.getValue<City>()!!.image,
-                                it.getValue<City>()!!.location
-                            )
-                        )
-                    }
-
-                    val scoreLast: MutableMap<String, Score> = mutableMapOf()
-
-                    cities.forEach() {
-                        if (it.key == currentLoc) {
-                            binding.locationName.text = it.key.toString()
-                            Glide.with(requireActivity())
-                                .load(it.image)
-                                .transform(CenterCrop(), RoundedCorners(40))
-                                .into(binding.cityImage)
-                        }
-
-                        val cityScoreRef = db.getReference("scores/${it.key}")
-                        val scores = ArrayList<Score>()
-                        val scoreListener = object : ValueEventListener {
-                            override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                                dataSnapshot.children.map { dataSnapshotScore ->
-                                    scores.add(
-                                        Score(
-                                            dataSnapshotScore.key,
-                                            dataSnapshotScore.getValue<Score>()!!.dateTime,
-                                            dataSnapshotScore.getValue<Score>()!!.description,
-                                            dataSnapshotScore.getValue<Score>()!!.score
-                                        )
-                                    )
-                                }
-                                scoreLast[it.key.toString()] = if (scores.isNotEmpty()) scores[scores.size - 1] else Score()
-
-                                cityAdapter = CityExploreAdapter(requireActivity(), cities, scoreLast)
-                                binding.exploreCityRv.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
-                                binding.exploreCityRv.setHasFixedSize(true)
-                                binding.exploreCityRv.adapter = cityAdapter
-                            }
-
-                            override fun onCancelled(databaseError: DatabaseError) {
-                                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-                            }
-                        }
-                        cityScoreRef.addValueEventListener(scoreListener)
-                    }
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-                }
-            }
-            ref.addValueEventListener(cityListener)
-
-            val refInformation = db.getReference("informations/${currentLoc}").limitToLast(1)
-            val informations = ArrayList<Information>()
-            val infoListener = object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                    dataSnapshot.children.map {
-                        informations.add(
-                            Information(
-                                it.key,
-                                it.getValue<Information>()!!.costOfLife,
-                                it.getValue<Information>()!!.internet,
-                                it.getValue<Information>()!!.numberOfDestinations,
-                                it.getValue<Information>()!!.numberOfHospitals,
-                                it.getValue<Information>()!!.numberOfPoliceStations,
-                                it.getValue<Information>()!!.population
-                            )
-                        )
-                    }
-
-                    informations.forEach() {
-                        binding.destinationsAmount.text = it.numberOfDestinations.toString()
-                        binding.hospitalAmount.text = it.numberOfHospitals.toString()
-                        binding.policeAmount.text = it.numberOfPoliceStations.toString()
-                    }
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-                }
-            }
-            refInformation.addValueEventListener(infoListener)
-
-            val refWeathers = db.getReference("weathers")
-            val weathers = ArrayList<Weather>()
+            val refWeathers = db.getReference("weathers/${currentLoc}")
             val weatherListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.childrenCount > 0){
+                        val temperature = dataSnapshot.getValue<Weather>()!!.temperature.toString()
+                        val formattedTemperature = getString(R.string._29_c, temperature)
+                        binding.temperature.text = formattedTemperature
 
-                    dataSnapshot.children.map {
-                        weathers.add(
-                            Weather(
-                                it.key,
-                                it.getValue<Weather>()!!.dateTime,
-                                it.getValue<Weather>()!!.temperature,
-                                it.getValue<Weather>()!!.weather
-                            )
-                        )
-                    }
-
-                    weathers.forEach() {
-                        if (it.key == currentLoc) {
-                            val temperature = it.temperature.toString()
-                            val formattedTemperature = getString(R.string._29_c, temperature)
-                            binding.temperature.text = formattedTemperature
-
-                            if (it.weather == "rain") {
+                        when (dataSnapshot.getValue<Weather>()!!.weather.toString()) {
+                            "rain" -> {
                                 binding.weatherIcon.setImageResource(R.drawable.rainy)
-                            } else if (it.weather == "sunny") {
+                            }
+                            "sunny" -> {
                                 binding.weatherIcon.setImageResource(R.drawable.sunny)
-                            } else if (it.weather == "stormy") {
+                            }
+                            "stormy" -> {
                                 binding.weatherIcon.setImageResource(R.drawable.stormy)
-                            } else if (it.weather == "cloudy") {
+                            }
+                            "cloudy" -> {
                                 binding.weatherIcon.setImageResource(R.drawable.cloudy)
                             }
                         }
@@ -223,12 +110,10 @@ class HomeFragment : Fragment() {
             }
             refWeathers.addValueEventListener(weatherListener)
 
-            Log.d("IsScoreCurrent", currentLoc)
             val refScores = db.getReference("scores/$currentLoc").limitToLast(1)
             var scoreCurrent: Any? = null
             val scoreCurrentListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-
                     if (dataSnapshot.childrenCount > 0) {
                         dataSnapshot.children.map {
                             scoreCurrent = it.getValue<ScoreCurrent>()!!.score
@@ -236,7 +121,6 @@ class HomeFragment : Fragment() {
                     } else {
                         scoreCurrent = 0
                     }
-                    Log.d("IsScoreCurrent", "$scoreCurrent")
 
                     if (scoreCurrent.toString().toDouble() <= 33) {
                         binding.safetyLevelText.text = getString(R.string.danger)
@@ -256,37 +140,115 @@ class HomeFragment : Fragment() {
             }
             refScores.addValueEventListener(scoreCurrentListener)
 
-            val dbPost = Firebase.firestore
-            val userAllPosts = ArrayList<PostsItem>()
-
-            dbPost.collection("posts")
-                .get()
-                .addOnSuccessListener {
-                    it.documents.forEach() { doc ->
-
-                        userAllPosts.add(
-                            PostsItem(
-                                image = doc.getString("image"),
-                                createdAt = CreatedAt(
-                                    seconds = doc.getTimestamp("createdAt")!!.seconds,
-                                    nanoseconds = doc.getTimestamp("createdAt")!!.nanoseconds
-                                ),
-                                caption = doc.getString("caption"),
-                                id = doc.getString("userId"),
-                                title = doc.getString("city"),
-                                idPost =  doc.getString("idPost"),
-                                name = doc.getString("name")
-                            )
-                        )
+            val refInformation = db.getReference("informations/${currentLoc}").limitToLast(1)
+            val infoListener = object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        dataSnapshot.children.map {
+                            binding.destinationsAmount.text = it.getValue<Information>()!!.numberOfDestinations.toString()
+                            binding.hospitalAmount.text = it.getValue<Information>()!!.numberOfHospitals.toString()
+                            binding.policeAmount.text = it.getValue<Information>()!!.numberOfPoliceStations.toString()
+                        }
+                    } else {
+                        binding.destinationsAmount.text = "0"
+                        binding.hospitalAmount.text = "0"
+                        binding.policeAmount.text = "0"
                     }
-
-                    postAdapter = PostHomeAdapter(requireActivity(), userAllPosts)
-                    binding.popularPostRv.layoutManager = LinearLayoutManager(requireActivity(),  LinearLayoutManager.HORIZONTAL, false)
-                    binding.popularPostRv.setHasFixedSize(true)
-                    binding.popularPostRv.adapter = postAdapter
                 }
 
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+                }
+            }
+            refInformation.addValueEventListener(infoListener)
+
+            val ref = db.getReference("cities/${currentLoc}")
+            val cityListener = object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.key == currentLoc) {
+                        binding.locationName.text = dataSnapshot.key.toString()
+                        Glide.with(requireActivity())
+                            .load(dataSnapshot.getValue<City>()!!.image.toString())
+                            .transform(CenterCrop(), RoundedCorners(40))
+                            .into(binding.cityImage)
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+                }
+            }
+            ref.addValueEventListener(cityListener)
         }
+
+        val cities = ArrayList<City>()
+        val scores: MutableMap<String, Score> = mutableMapOf()
+        db.getReference("cities").get().addOnSuccessListener {
+            it.children.map {city ->
+                cities.add(
+                    City(
+                        city.key,
+                        city.getValue<City>()!!.area,
+                        city.getValue<City>()!!.capital,
+                        city.getValue<City>()!!.country,
+                        city.getValue<City>()!!.description,
+                        city.getValue<City>()!!.image,
+                        city.getValue<City>()!!.location
+                    )
+                )
+            }
+
+            cities.forEach {city ->
+                db.getReference("scores/${city.key}").limitToLast(1).get().addOnSuccessListener {score ->
+                    if (!score.exists()) {
+                        scores[score.key.toString()] = Score()
+                    } else {
+                        scores[score.key.toString()] = Score(
+                            score.key,
+                            score.getValue<Score>()!!.score
+                        )
+                    }
+                }
+            }
+
+            cityAdapter = CityExploreAdapter(requireActivity(), cities, scores)
+            binding.exploreCityRv.layoutManager =
+                LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+            binding.exploreCityRv.setHasFixedSize(true)
+            binding.exploreCityRv.adapter = cityAdapter
+        }
+
+        val dbPost = Firebase.firestore
+        val userAllPosts = ArrayList<PostsItem>()
+
+        dbPost.collection("posts")
+            .get()
+            .addOnSuccessListener {
+                it.documents.forEach { doc ->
+
+                    userAllPosts.add(
+                        PostsItem(
+                            image = doc.getString("image"),
+                            createdAt = CreatedAt(
+                                seconds = doc.getTimestamp("createdAt")!!.seconds,
+                                nanoseconds = doc.getTimestamp("createdAt")!!.nanoseconds
+                            ),
+                            caption = doc.getString("caption"),
+                            id = doc.getString("userId"),
+                            title = doc.getString("city"),
+                            idPost =  doc.getString("idPost"),
+                            name = doc.getString("name")
+                        )
+                    )
+                }
+
+                postAdapter = PostHomeAdapter(requireActivity(), userAllPosts)
+                binding.popularPostRv.layoutManager = LinearLayoutManager(requireActivity(),  LinearLayoutManager.HORIZONTAL, false)
+                binding.popularPostRv.setHasFixedSize(true)
+                binding.popularPostRv.adapter = postAdapter
+            }
+
+
 
         binding.favoriteButton.setOnClickListener {
             val intentFavorite = Intent(activity, FavoriteActivity::class.java)
