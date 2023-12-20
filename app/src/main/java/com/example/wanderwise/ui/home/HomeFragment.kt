@@ -128,7 +128,6 @@ class HomeFragment : Fragment() {
                                         )
                                     )
                                 }
-                                Log.d("TestingScoreCity", "${it.key.toString()} $scores")
                                 scoreLast[it.key.toString()] = if (scores.isNotEmpty()) scores[scores.size - 1] else Score()
 
                                 cityAdapter = CityExploreAdapter(requireActivity(), cities, scoreLast)
@@ -238,13 +237,14 @@ class HomeFragment : Fragment() {
                         scoreCurrent = 0
                     }
                     Log.d("IsScoreCurrent", "$scoreCurrent")
-                    if (scoreCurrent as Int <= 33) {
+
+                    if (scoreCurrent.toString().toDouble() <= 33) {
                         binding.safetyLevelText.text = getString(R.string.danger)
                         binding.safetyIcon.setImageResource(R.drawable.danger_icon_small)
-                    } else if (scoreCurrent as Int<= 70) {
+                    } else if (scoreCurrent.toString().toDouble() <= 70) {
                         binding.safetyLevelText.text = getString(R.string.warning)
                         binding.safetyIcon.setImageResource(R.drawable.warning_icon_small)
-                    } else if (scoreCurrent as Int <= 100) {
+                    } else if (scoreCurrent.toString().toDouble() <= 100) {
                         binding.safetyLevelText.text = getString(R.string.safe)
                         binding.safetyIcon.setImageResource(R.drawable.safe_icon_small)
                     }
@@ -280,8 +280,8 @@ class HomeFragment : Fragment() {
                         )
                     }
 
-                    postAdapter = PostHomeAdapter(requireContext(), userAllPosts)
-                    binding.popularPostRv.layoutManager = LinearLayoutManager(requireContext(),  LinearLayoutManager.HORIZONTAL, false)
+                    postAdapter = PostHomeAdapter(requireActivity(), userAllPosts)
+                    binding.popularPostRv.layoutManager = LinearLayoutManager(requireActivity(),  LinearLayoutManager.HORIZONTAL, false)
                     binding.popularPostRv.setHasFixedSize(true)
                     binding.popularPostRv.adapter = postAdapter
                 }

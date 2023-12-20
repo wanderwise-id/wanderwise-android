@@ -59,18 +59,30 @@ class InformationFragment : Fragment() {
             val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
             val refCity = db.getReference("cities/${cityKey}")
-            var city = City()
+            var city = City(
+                "",
+                0.0,
+                "",
+                "",
+                "",
+                "",
+                ""
+            )
             val cityListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    city = City(
-                        dataSnapshot.key,
-                        dataSnapshot.getValue<City>()!!.area,
-                        dataSnapshot.getValue<City>()!!.capital,
-                        dataSnapshot.getValue<City>()!!.country,
-                        dataSnapshot.getValue<City>()!!.description,
-                        dataSnapshot.getValue<City>()!!.image,
-                        dataSnapshot.getValue<City>()!!.location,
-                    )
+                    Log.d("testingIsiDataSnapshot", "${dataSnapshot.hasChildren()}")
+
+                    if (dataSnapshot.hasChildren()) {
+                        city = City(
+                            dataSnapshot.key,
+                            dataSnapshot.getValue<City>()!!.area,
+                            dataSnapshot.getValue<City>()!!.capital,
+                            dataSnapshot.getValue<City>()!!.country,
+                            dataSnapshot.getValue<City>()!!.description,
+                            dataSnapshot.getValue<City>()!!.image,
+                            dataSnapshot.getValue<City>()!!.location,
+                        )
+                    }
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
