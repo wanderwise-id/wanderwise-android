@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -62,6 +63,7 @@ class HomeFragment : Fragment() {
         (requireActivity().application as MyLocation).sharedData = "Alex"
 
         var currentLoc = ""
+        var disableDetailAccess = false
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
@@ -78,6 +80,28 @@ class HomeFragment : Fragment() {
             ))
 
             currentLoc = cityUser.userLocation
+
+            val ref = db.getReference("cities/${currentLoc}")
+            val cityListener = object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        binding.locationName.text = dataSnapshot.key.toString()
+                        Glide.with(requireActivity())
+                            .load(dataSnapshot.getValue<City>()!!.image.toString())
+                            .transform(CenterCrop(), RoundedCorners(40))
+                            .into(binding.cityImage)
+                    } else {
+                        binding.locationName.text = "Unlisted"
+                        binding.cityImage.setImageResource(R.drawable.baseline_warning_image)
+                        disableDetailAccess = true
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+                }
+            }
+            ref.addValueEventListener(cityListener)
 
             val refWeathers = db.getReference("weathers/${currentLoc}")
             val weatherListener = object : ValueEventListener {
@@ -161,27 +185,6 @@ class HomeFragment : Fragment() {
                 }
             }
             refInformation.addValueEventListener(infoListener)
-
-            val ref = db.getReference("cities/${currentLoc}")
-            val cityListener = object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        binding.locationName.text = dataSnapshot.key.toString()
-                        Glide.with(requireActivity())
-                            .load(dataSnapshot.getValue<City>()!!.image.toString())
-                            .transform(CenterCrop(), RoundedCorners(40))
-                            .into(binding.cityImage)
-                    } else {
-                        binding.locationName.text = "Your Location not Reached"
-                        binding.cityImage.setImageResource(R.drawable.baseline_warning_image)
-                    }
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-                }
-            }
-            ref.addValueEventListener(cityListener)
         }
 
         val cities = ArrayList<City>()
@@ -290,9 +293,14 @@ class HomeFragment : Fragment() {
                 )
             }
 
-            val intent = Intent(activity, DetailInfoCityActivity::class.java)
-            intent.putExtra(DetailInfoCityActivity.KEY_CITY, currentLoc)
-            startActivity(intent)
+            if(!disableDetailAccess){
+                val intent = Intent(activity, DetailInfoCityActivity::class.java)
+                intent.putExtra(DetailInfoCityActivity.KEY_CITY, currentLoc)
+                startActivity(intent)
+            } else {
+                Toast.makeText(context, "Your Location is Not Listed in Our Database", Toast.LENGTH_LONG).show()
+            }
+
         }
 
         binding.seeAll.setOnClickListener {

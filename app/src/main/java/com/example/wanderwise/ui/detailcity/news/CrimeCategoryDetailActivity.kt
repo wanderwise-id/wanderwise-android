@@ -24,6 +24,7 @@ import com.example.wanderwise.databinding.ActivityCrimeCategoryDetailBinding
 import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.ui.adapter.CityExploreAdapter
 import com.example.wanderwise.ui.adapter.CrimeCategoryNewsAdapter
+import com.example.wanderwise.ui.detailcity.DetailInfoCityActivity
 import com.example.wanderwise.ui.home.HomeViewModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -46,66 +47,37 @@ class CrimeCategoryDetailActivity : AppCompatActivity() {
         binding = ActivityCrimeCategoryDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val cityKey = intent.getStringExtra(CrimeCategoryDetailActivity.CITY)
+
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
-        val ref = db.getReference("cities")
-        val cities = ArrayList<City>()
-        val cityListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-                dataSnapshot.children.map {
-                    cities.add(
-                        City(
-                            it.key,
-                            it.getValue<City>()!!.area,
-                            it.getValue<City>()!!.capital,
-                            it.getValue<City>()!!.country,
-                            it.getValue<City>()!!.description,
-                            it.getValue<City>()!!.image,
-                            it.getValue<City>()!!.location
-                        )
+        val newsDetails = ArrayList<Crime>()
+        db.getReference("news/${cityKey}/Crime").get().addOnSuccessListener {
+            it.children.map {dataSnapshot ->
+                newsDetails.add(
+                    Crime(
+                        dataSnapshot.key,
+                        dataSnapshot.getValue<Crime>()!!.category,
+                        dataSnapshot.getValue<Crime>()!!.date_published,
+                        dataSnapshot.getValue<Crime>()!!.image,
+                        dataSnapshot.getValue<Crime>()!!.location,
+                        dataSnapshot.getValue<Crime>()!!.summarize,
+                        dataSnapshot.getValue<Crime>()!!.timezone,
+                        dataSnapshot.getValue<Crime>()!!.title
                     )
-                }
-
-                cities.forEach() {
-                    val refCrime = db.getReference("news/${it.key}/Crime")
-                    val newsDetails = ArrayList<Crime>()
-                    val newsAmountListener = object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            dataSnapshot.children.map {dataSnapshot ->
-                                newsDetails.add(
-                                    Crime(
-                                        dataSnapshot.key,
-                                        dataSnapshot.getValue<Crime>()!!.category,
-                                        dataSnapshot.getValue<Crime>()!!.date_published,
-                                        dataSnapshot.getValue<Crime>()!!.image,
-                                        dataSnapshot.getValue<Crime>()!!.location,
-                                        dataSnapshot.getValue<Crime>()!!.summarize,
-                                        dataSnapshot.getValue<Crime>()!!.timezone,
-                                        dataSnapshot.getValue<Crime>()!!.title
-                                    )
-                                )
-
-                                crimeNewsAdapter = CrimeCategoryNewsAdapter(this@CrimeCategoryDetailActivity, newsDetails)
-                                binding.rvCrimeCategoryNews.layoutManager = LinearLayoutManager(this@CrimeCategoryDetailActivity)
-                                binding.rvCrimeCategoryNews.setHasFixedSize(true)
-                                binding.rvCrimeCategoryNews.adapter = crimeNewsAdapter
-                            }
-                        }
-
-                        override fun onCancelled(databaseError: DatabaseError) {
-                            Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-                        }
-                    }
-                    refCrime.addValueEventListener(newsAmountListener)
-                }
+                )
             }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-            }
+            crimeNewsAdapter = CrimeCategoryNewsAdapter(this@CrimeCategoryDetailActivity, newsDetails)
+            binding.rvCrimeCategoryNews.layoutManager = LinearLayoutManager(this@CrimeCategoryDetailActivity)
+            binding.rvCrimeCategoryNews.setHasFixedSize(true)
+            binding.rvCrimeCategoryNews.adapter = crimeNewsAdapter
         }
-        ref.addValueEventListener(cityListener)
 
         supportActionBar?.hide()
+    }
+
+    companion object {
+        const val CITY = "city"
     }
 }

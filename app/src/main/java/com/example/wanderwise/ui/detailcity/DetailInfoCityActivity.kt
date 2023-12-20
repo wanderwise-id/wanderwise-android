@@ -24,68 +24,35 @@ import com.google.firebase.database.getValue
 class DetailInfoCityActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailInfoCityBinding
-    private var cityKey: String? = null
-    private var keyCity: String? = null
+    private var exploreCard: String? = null
+    private var detailCard: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailInfoCityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        cityKey = intent.getStringExtra(CITY)
-        keyCity = intent.getStringExtra(KEY_CITY)
+        exploreCard = intent.getStringExtra(CITY)
+        detailCard = intent.getStringExtra(KEY_CITY)
+
+        val cityKey = exploreCard ?: detailCard
+
         (this.application as MyLocation).sharedData = cityKey.toString()
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        val ref = db.getReference("cities")
-        val cities = ArrayList<City>()
-        val cityListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
+        db.getReference("cities/$cityKey").get().addOnSuccessListener {
+            if (it.exists()) {
+                val titleCity = it.key.toString()
 
-                dataSnapshot.children.map {
-                    cities.add(
-                        City(
-                            it.key,
-                            it.getValue<City>()!!.area,
-                            it.getValue<City>()!!.capital,
-                            it.getValue<City>()!!.country,
-                            it.getValue<City>()!!.description,
-                            it.getValue<City>()!!.image,
-                            it.getValue<City>()!!.location
-                        )
-                    )
-                }
-
-                cities.forEach() {
-                    if (it.key == keyCity) {
-                        val titleCity = it.key.toString()
-
-                        val formattedTitle = getString(R.string.what_is_denpasar_city, titleCity)
-                        binding.titleCity.text = formattedTitle
-                        Glide.with(binding.root)
-                            .load(it.image)
-                            .into(binding.cityPhoto)
-                        binding.descriptionSummary.text = it.description.toString()
-
-                    } else if (it.key == cityKey) {
-                        val titleCity = it.key.toString()
-
-                        val formattedTitle = getString(R.string.what_is_denpasar_city, titleCity)
-                        binding.titleCity.text = formattedTitle
-                        Glide.with(binding.root)
-                            .load(it.image)
-                            .into(binding.cityPhoto)
-                        binding.descriptionSummary.text = it.description.toString()
-                    }
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+                val formattedTitle = getString(R.string.what_is_denpasar_city, titleCity)
+                binding.titleCity.text = formattedTitle
+                Glide.with(binding.root)
+                    .load(it.getValue<City>()!!.image.toString())
+                    .into(binding.cityPhoto)
+                binding.descriptionSummary.text = it.getValue<City>()!!.description.toString()
             }
         }
-        ref.addValueEventListener(cityListener)
 
         val pagerAdapter = SectionPagerAdapter(supportFragmentManager)
         binding.viewPager.adapter = pagerAdapter

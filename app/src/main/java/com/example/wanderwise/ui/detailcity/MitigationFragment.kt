@@ -45,26 +45,16 @@ class MitigationFragment : Fragment() {
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        val refMitigations = db.getReference("mitigations/${cityKey}")
-
-        val mitigationListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if(dataSnapshot.childrenCount > 0){
-                    binding.mitigationInfo.text = dataSnapshot.getValue<Mitigation>()!!.content.toString()
-                    binding.mitigationHead.text = dataSnapshot.getValue<Mitigation>()!!.head.toString()
-                } else{
-                    binding.mitigationInfo.text = "-"
-                    binding.mitigationHead.text = "-"
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+        db.getReference("mitigations/${cityKey}").get().addOnSuccessListener {
+            if(it.childrenCount > 0){
+                binding.mitigationInfo.text = it.getValue<Mitigation>()!!.content.toString()
+                binding.mitigationHead.text = it.getValue<Mitigation>()!!.head.toString()
+            } else{
+                binding.mitigationInfo.text = "Tidak Ada Informasi Mitigasi"
+                binding.mitigationHead.text = "~"
             }
         }
-        refMitigations.addValueEventListener(mitigationListener)
 
-        // Inflate the layout for this fragment
         return view
     }
 }

@@ -41,6 +41,7 @@ class InformationFragment : Fragment() {
         ViewModelFactory.getInstance(requireActivity())
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,148 +49,115 @@ class InformationFragment : Fragment() {
         _binding = FragmentInformationBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        homeViewModel.getSessionUser().observe(viewLifecycleOwner) { cityCurrent ->
-            var cityKey = ""
+        val cityKey = (requireActivity().application as MyLocation).sharedData
 
-            cityKey = if (cityCurrent.currentActivity == "profile") {
-                (requireActivity().application as MyLocation).sharedData.toString()
-            } else {
-                cityCurrent.userLocation
-            }
+        Log.d("information-city-key","$cityKey")
 
-            val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
+        if (cityKey == null){
+            return view
+        }
 
-            val refCity = db.getReference("cities/${cityKey}")
-            var city = City(
+        val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
+
+        var city = City(
+            "",
+            1,
+            "",
+            "",
+            "",
+            "",
+            LocationCity(
                 "",
-                0.0,
-                "",
-                "",
-                "",
-                "",
-                LocationCity(
-                    "",
-                    ""
-                )
+                ""
             )
-            val cityListener = object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    Log.d("testingIsiDataSnapshot", "${dataSnapshot.hasChildren()}")
+        )
 
-                    if (dataSnapshot.hasChildren()) {
-                        city = City(
-                            dataSnapshot.key,
-                            dataSnapshot.getValue<City>()!!.area,
-                            dataSnapshot.getValue<City>()!!.capital,
-                            dataSnapshot.getValue<City>()!!.country,
-                            dataSnapshot.getValue<City>()!!.description,
-                            dataSnapshot.getValue<City>()!!.image,
-                            dataSnapshot.getValue<City>()!!.location,
-                        )
-                    }
+        db.getReference("cities/${cityKey}").get().addOnSuccessListener {
+            if (it.hasChildren()) {
+                city = City(
+                    it.key,
+                    it.getValue<City>()!!.area,
+                    it.getValue<City>()!!.capital,
+                    it.getValue<City>()!!.country,
+                    it.getValue<City>()!!.description,
+                    it.getValue<City>()!!.image,
+                    it.getValue<City>()!!.location,
+                )
+            }
+        }
+
+        var score: Any? = null
+        db.getReference("scores/${cityKey}").limitToLast(1).get().addOnSuccessListener {
+            if (it.childrenCount > 0) {
+                for (child in it.children){
+                    score = child.getValue<Score>()!!.score
                 }
+            } else {
+                score = 0
+            }
+        }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+        db.getReference("informations/${cityKey}").limitToLast(1).get().addOnSuccessListener {
+            Log.d("informationsDebug", "$it")
+            var information = FullInfo()
+
+            if (it.hasChildren()){
+                it.children.forEach{child ->
+                    Log.d("informationsDebugChild", "$child")
+                    information = FullInfo(
+                        key = child.key,
+                        costOfLife = child.getValue<FullInfo>()!!.costOfLife,
+                        internet = child.getValue<FullInfo>()!!.internet,
+                        temperature = child.getValue<FullInfo>()!!.temperature,
+                        numberOfDestinations = child.getValue<FullInfo>()!!.numberOfDestinations,
+                        numberOfHospitals = child.getValue<FullInfo>()!!.numberOfHospitals,
+                        numberOfPoliceStations = child.getValue<FullInfo>()!!.numberOfPoliceStations,
+                        population = child.getValue<FullInfo>()!!.population
+                    )
                 }
             }
-            refCity.addValueEventListener(cityListener)
 
-            var score: Any? = null
-            val refScore = db.getReference("scores/${cityKey}").limitToLast(1)
-            val scoreListener = object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.childrenCount > 0) {
-                        for (child in dataSnapshot.children){
-                            score = child.getValue<Score>()!!.score
-                        }
-                    } else {
-                        score = 0
-                    }
-                }
+            var population = 0
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+            if (information.population != null){
+                population = (information.population.toString().toDouble()/city.area.toString().toDouble()).toInt()
+            }
+
+            binding.populationAmount.text = "${population.toString()} ppl/km²"
+            binding.costAmount.text = "${information.costOfLife.toString()} USD/Month"
+
+            var internetSpeed = ""
+
+            if (information.internet != null){
+                information.internet = information.internet.toString().toInt()
+
+                if (information.internet as Int <= 20)
+                    internetSpeed = "Slow"
+
+                if (information.internet as Int >= 21 && information.internet as Int <= 40)
+                    internetSpeed = "Medium"
+
+                if (information.internet as Int > 40)
+                    internetSpeed = "Fast"
+            }
+
+            binding.internetSpeed.text = "$internetSpeed ${information.internet} Mbps (avg)"
+            binding.temperatureAmount.text = "${information.temperature} °C"
+            binding.hospitalAmountInfo.text = "${information.numberOfHospitals} Hospital"
+            binding.policeAmountInfo.text = "${information.numberOfPoliceStations} Police"
+
+            if (score != null){
+                if (score.toString().toDouble() <= 33) {
+                    binding.safetyScoreLevel.text = getString(R.string.danger)
+                    binding.safetyImage.setImageResource(R.drawable.danger_icon_large)
+                } else if (score.toString().toDouble() <= 70) {
+                    binding.safetyScoreLevel.text = getString(R.string.warning)
+                    binding.safetyImage.setImageResource(R.drawable.warning_icon_large)
+                } else if (score.toString().toDouble() <= 100) {
+                    binding.safetyScoreLevel.text = getString(R.string.safe)
+                    binding.safetyImage.setImageResource(R.drawable.safe_icon_large)
                 }
             }
-            refScore.addValueEventListener(scoreListener)
-
-            val refInformation = db.getReference("informations/${cityKey}").limitToLast(1)
-            val infoListener = object : ValueEventListener {
-                @SuppressLint("SetTextI18n")
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    var information = FullInfo()
-
-                    if (dataSnapshot.childrenCount <= 0){
-                        information = FullInfo(
-                            "",
-                            0,
-                            0, 0,
-                            0,
-                            0,
-                            0,
-                            0)
-                    } else {
-                        for (child in dataSnapshot.children){
-                            information = FullInfo(
-                                child.key,
-                                child.getValue<FullInfo>()!!.costOfLife,
-                                child.getValue<FullInfo>()!!.internet,
-                                child.getValue<FullInfo>()!!.temperature,
-                                child.getValue<FullInfo>()!!.numberOfDestinations,
-                                child.getValue<FullInfo>()!!.numberOfHospitals,
-                                child.getValue<FullInfo>()!!.numberOfPoliceStations,
-                                child.getValue<FullInfo>()!!.population
-                            )
-                        }
-                    }
-
-                    if (information != null){
-                        val population = (information.population.toString().toDouble()/city.area.toString().toDouble()).toInt()
-
-                        binding.populationAmount.text = "${population.toString()} ppl/km²"
-                        binding.costAmount.text = "${information.costOfLife.toString()} USD/Month"
-
-                        var internetSpeed = ""
-                        information.internet = information.internet.toString().toInt()
-
-                        if (information.internet as Int <= 20)
-                            internetSpeed = "Slow"
-
-                        if (information.internet as Int >= 21 && information.internet as Int <= 40)
-                            internetSpeed = "Medium"
-
-                        if (information.internet as Int > 40)
-                            internetSpeed = "Fast"
-
-                        binding.internetSpeed.text = "${internetSpeed} ${information.internet} Mbps (avg)"
-                        binding.temperatureAmount.text = "${information.temperature} °C"
-                        binding.hospitalAmountInfo.text = "${information.numberOfHospitals} Hospital"
-                        binding.policeAmountInfo.text = "${information.numberOfPoliceStations} Police"
-                    }
-
-                    if (score != null){
-                        if (score.toString().toDouble() <= 33) {
-                            binding.safetyScoreLevel.text = getString(R.string.danger)
-                            binding.safetyImage.setImageResource(R.drawable.danger_icon_large)
-                        } else if (score.toString().toDouble() <= 70) {
-                            binding.safetyScoreLevel.text = getString(R.string.warning)
-                            binding.safetyImage.setImageResource(R.drawable.warning_icon_large)
-                        } else if (score.toString().toDouble() <= 100) {
-                            binding.safetyScoreLevel.text = getString(R.string.safe)
-                            binding.safetyImage.setImageResource(R.drawable.safe_icon_large)
-                        }
-                    }
-
-                    Log.d("score", "${score}")
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-                }
-            }
-            refInformation.addValueEventListener(infoListener)
-
         }
 
         return view

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -44,39 +45,40 @@ class NewsFragment : Fragment() {
         val cityKey = (requireActivity().application as MyLocation).sharedData
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        val ref = db.getReference("news/${cityKey}")
         val newsAmount = ArrayList<News>()
-        val newsAmountListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                dataSnapshot.children.map {
+        db.getReference("news/${cityKey}").get().addOnSuccessListener{dataSnapshot ->
+            dataSnapshot.children.map {category ->
+                category.children.map {news ->
                     newsAmount.add(
                         News(
-                            it.key
+                            news.key
                         )
                     )
                 }
-
-                if (newsAmount.size > 0) {
-                    Glide.with(requireActivity())
-                        .load(R.drawable.crime_image)
-                        .transform(CenterCrop(), RoundedCorners(40))
-                        .into(binding.imagePreviewNews)
-
-                    binding.notifAmount.text = newsAmount.size.toString()
-
-                    binding.crimeCard.setOnClickListener {
-                        val intentCrimeNews = Intent(activity, CrimeCategoryDetailActivity::class.java)
-                        startActivity(intentCrimeNews)
-                    }
-                }
-
             }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+            var newsSize = 0
+            if (newsAmount.size > 0) {
+                newsSize = newsAmount.size
+            }
+
+            Glide.with(requireActivity())
+                .load(R.drawable.crime_image)
+                .transform(CenterCrop(), RoundedCorners(40))
+                .into(binding.imagePreviewNews)
+
+            binding.notifAmount.text = newsSize.toString()
+
+            binding.crimeCard.setOnClickListener {
+                if (newsSize > 0){
+                    val intentCrimeNews = Intent(activity, CrimeCategoryDetailActivity::class.java)
+                    intentCrimeNews.putExtra(CrimeCategoryDetailActivity.CITY, cityKey.toString())
+                    startActivity(intentCrimeNews)
+                } else {
+                    Toast.makeText(context, "$cityKey doesn't have any Crime News", Toast.LENGTH_LONG).show()
+                }
             }
         }
-        ref.addValueEventListener(newsAmountListener)
 
         return view
     }

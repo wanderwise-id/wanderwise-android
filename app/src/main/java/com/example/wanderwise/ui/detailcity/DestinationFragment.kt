@@ -45,34 +45,24 @@ class DestinationFragment : Fragment() {
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        val ref = db.getReference("destinations/${cityKey}")
         val destinations = ArrayList<Destination>()
-        val destinationListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                dataSnapshot.children.map {
-                    destinations.add(
-                        Destination(
-                            it.key,
-                            it.getValue<Destination>()!!.image,
-                            it.getValue<Destination>()!!.location,
-                            it.getValue<Destination>()!!.name
-                        )
+        db.getReference("destinations/${cityKey}").get().addOnSuccessListener{data ->
+            data.children.map {
+                destinations.add(
+                    Destination(
+                        it.key,
+                        it.getValue<Destination>()!!.image,
+                        it.getValue<Destination>()!!.location,
+                        it.getValue<Destination>()!!.name
                     )
-                }
-
-                destinations.forEach() { _ ->
-                    cityAdapter = DestinationAdapter(destinations)
-                        binding.rvDestination.layoutManager = LinearLayoutManager(requireContext())
-                        binding.rvDestination.setHasFixedSize(true)
-                        binding.rvDestination.adapter = cityAdapter
-                }
+                )
             }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
-            }
+            cityAdapter = DestinationAdapter(destinations)
+            binding.rvDestination.layoutManager = LinearLayoutManager(requireContext())
+            binding.rvDestination.setHasFixedSize(true)
+            binding.rvDestination.adapter = cityAdapter
         }
-        ref.addValueEventListener(destinationListener)
 
         return view
     }
