@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -38,9 +39,19 @@ import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.Logger
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
 import com.google.firebase.firestore.firestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.lang.Exception
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -54,6 +65,8 @@ class HomeFragment : Fragment() {
     }
 
     private lateinit var postAdapter: PostHomeAdapter
+
+    private val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -103,6 +116,20 @@ class HomeFragment : Fragment() {
                 }
             }
             ref.addValueEventListener(cityListener)
+
+            val currentTime = System.currentTimeMillis()
+            val oneDayAgo = currentTime - (24 * 60 * 60 * 1000)
+            val refNotifications = db.getReference("notifications/${currentLoc}").orderByChild("timestamp").startAt(oneDayAgo.toString().toDouble())
+            val notificationListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    binding.notifAmount.text = snapshot.childrenCount.toString()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("TAG", "loadPost:onCancelled", error.toException())
+                }
+            }
+            refNotifications.addValueEventListener(notificationListener)
 
             val refWeathers = db.getReference("weathers/${currentLoc}")
             val weatherListener = object : ValueEventListener {
@@ -188,59 +215,67 @@ class HomeFragment : Fragment() {
             refInformation.addValueEventListener(infoListener)
         }
 
-        val cities = ArrayList<City>()
-        val scores: MutableMap<String, Score> = mutableMapOf()
-        db.getReference("cities").get().addOnSuccessListener {
-            it.children.map {city ->
-                cities.add(
+        try {
 
-                    City(
-                        city.key,
-                        city.getValue<City>()!!.area,
-                        city.getValue<City>()!!.capital,
-                        city.getValue<City>()!!.country,
-                        city.getValue<City>()!!.description,
-                        city.getValue<City>()!!.image,
-                        city.getValue<City>()!!.location
-                    )
-                )
-            }
+            val cities = ArrayList<City>()
+            val scores = ArrayList<Double>()
+            var citiesSnapshot: Any? = null
+            lifecycleScope.launch {
+                citiesSnapshot = db.getReference("cities").get().await()
 
-            cities.forEach {city ->
-                db.getReference("scores/${city.key}").limitToLast(1).get().addOnSuccessListener {score ->
-                    if (!score.exists()) {
-                        scores[score.key.toString()] = Score()
-                    } else {
-                        scores[score.key.toString()] = Score(
-                            score.key,
-                            score.getValue<Score>()!!.score
+                (citiesSnapshot as DataSnapshot?)?.children?.forEach { city ->
+                    cities.add(
+                        City(
+                            city.key,
+                            city.getValue<City>()!!.area,
+                            city.getValue<City>()!!.capital,
+                            city.getValue<City>()!!.country,
+                            city.getValue<City>()!!.description,
+                            city.getValue<City>()!!.image,
+                            city.getValue<City>()!!.location
                         )
+                    )
+                }
+
+                val deferredScores = cities.map { city ->
+                    async {
+                        val scoreSnapshot = db.getReference("scores/${city.key}").limitToLast(1).get().await()
+
+                        if (scoreSnapshot.childrenCount > 0) {
+                            scoreSnapshot.children.first().getValue<Score>()?.score?.toString()?.toDouble() ?: 0.0
+                        } else {
+                            0.0
+                        }
                     }
                 }
+
+                val cityFavorite: CityFavorite = CityFavorite(
+                    id = 0,
+                    key = "",
+                    isLoved = false
+                )
+
+                scores.addAll(deferredScores.map { it.await() })
+
+                cityAdapter = CityExploreAdapter(requireActivity(), cities, scores, homeViewModel, cityFavorite, viewLifecycleOwner)
+                binding.exploreCityRv.layoutManager =
+                    LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+                binding.exploreCityRv.setHasFixedSize(true)
+                binding.exploreCityRv.adapter = cityAdapter
             }
-
-            val cityFavorite: CityFavorite = CityFavorite(
-                id = 0,
-                key = "",
-                isLoved = false
-            )
-
-            cityAdapter = CityExploreAdapter(requireActivity(), cities, scores, homeViewModel, cityFavorite, viewLifecycleOwner)
-
-            binding.exploreCityRv.layoutManager =
-                LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
-            binding.exploreCityRv.setHasFixedSize(true)
-            binding.exploreCityRv.adapter = cityAdapter
+        } catch (e: Exception){
+            Log.e("Error", "Failed to fetch data: ${e.message}")
         }
 
-        val dbPost = Firebase.firestore
-        val userAllPosts = ArrayList<PostsItem>()
 
-        dbPost.collection("posts")
-            .get()
-            .addOnSuccessListener {
-                it.documents.forEach { doc ->
+        try {
+            val dbPost = Firebase.firestore
+            val userAllPosts = ArrayList<PostsItem>()
 
+            lifecycleScope.launch {
+                val postsDataSnapshot = dbPost.collection("posts").get().await()
+
+                postsDataSnapshot.documents.forEach{doc ->
                     userAllPosts.add(
                         PostsItem(
                             image = doc.getString("image"),
@@ -262,8 +297,9 @@ class HomeFragment : Fragment() {
                 binding.popularPostRv.setHasFixedSize(true)
                 binding.popularPostRv.adapter = postAdapter
             }
-
-
+        } catch (e: Exception){
+            Log.e("Error", "Failed to fetch data: ${e.message}")
+        }
 
         binding.favoriteButton.setOnClickListener {
             val intentFavorite = Intent(activity, FavoriteActivity::class.java)
@@ -289,7 +325,7 @@ class HomeFragment : Fragment() {
         binding.cardDetailCity.setOnClickListener {
             homeViewModel.getSessionUser().observe(viewLifecycleOwner) { user ->
                 homeViewModel.editUserModel(
-                        UserModel(
+                    UserModel(
                         name = user.name,
                         token = user.token,
                         email = user.email,
