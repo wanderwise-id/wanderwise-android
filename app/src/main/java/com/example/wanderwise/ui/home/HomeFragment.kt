@@ -165,12 +165,15 @@ class HomeFragment : Fragment() {
             val ref = db.getReference("cities/${currentLoc}")
             val cityListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.key == currentLoc) {
+                    if (dataSnapshot.exists()) {
                         binding.locationName.text = dataSnapshot.key.toString()
                         Glide.with(requireActivity())
                             .load(dataSnapshot.getValue<City>()!!.image.toString())
                             .transform(CenterCrop(), RoundedCorners(40))
                             .into(binding.cityImage)
+                    } else {
+                        binding.locationName.text = "Your Location not Reached"
+                        binding.cityImage.setImageResource(R.drawable.baseline_warning_image)
                     }
                 }
 
