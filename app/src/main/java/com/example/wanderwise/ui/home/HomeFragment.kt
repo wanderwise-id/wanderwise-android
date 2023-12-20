@@ -25,6 +25,7 @@ import com.example.wanderwise.data.database.Information
 import com.example.wanderwise.data.database.Score
 import com.example.wanderwise.data.database.ScoreCurrent
 import com.example.wanderwise.data.database.Weather
+import com.example.wanderwise.data.local.database.CityFavorite
 import com.example.wanderwise.data.preferences.UserModel
 import com.example.wanderwise.data.response.CreatedAt
 import com.example.wanderwise.data.response.PostsItem
@@ -218,7 +219,14 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            cityAdapter = CityExploreAdapter(requireActivity(), cities, scores)
+            val cityFavorite: CityFavorite = CityFavorite(
+                id = 0,
+                key = "",
+                isLoved = false
+            )
+
+            cityAdapter = CityExploreAdapter(requireActivity(), cities, scores, homeViewModel, cityFavorite, viewLifecycleOwner)
+
             binding.exploreCityRv.layoutManager =
                 LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
             binding.exploreCityRv.setHasFixedSize(true)

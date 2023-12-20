@@ -118,23 +118,6 @@ class AddPostActivity : AppCompatActivity() {
         supportActionBar?.title = "Add post"
     }
 
-    private fun navigateToYourFragment() {
-        // Create an instance of the fragment you want to navigate to
-        val newFragment = PostFragment()
-
-        // Start a fragment transaction
-        val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
-
-        // Replace the current fragment with the new one
-        transaction.replace(R.id.container_fragment, newFragment, "another_fragment_tag")
-
-        // Optionally, add the transaction to the back stack
-        transaction.addToBackStack(null)
-
-        // Commit the transaction
-        transaction.commit()
-    }
-
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }

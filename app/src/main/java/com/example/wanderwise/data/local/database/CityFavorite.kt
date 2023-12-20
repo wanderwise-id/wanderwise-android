@@ -10,10 +10,12 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class CityFavorite(
 
-    @PrimaryKey(autoGenerate = false)
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
 
     @ColumnInfo(name = "key")
-    val key: String? = null
+    var key: String? = null,
 
+    @ColumnInfo(name = "isLoved")
+    var isLoved: Boolean = false
 ): Parcelable

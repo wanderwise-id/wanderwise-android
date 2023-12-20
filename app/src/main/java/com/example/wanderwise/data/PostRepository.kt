@@ -176,7 +176,7 @@ class PostRepository private constructor
             val uidUser = successResponse.body.uid
             val isLogin = true
             Log.d("tokenCheck", token)
-            saveSession(UserModel(name, token, emailUser, uidUser, "Location", "profile", isLogin))
+                saveSession(UserModel(name, token, emailUser, uidUser, "Location", "profile", isLogin))
             emit(Result.Success("Thanks ${successResponse.body.name} for the Login!"))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()

@@ -6,19 +6,26 @@ import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
 import com.example.wanderwise.data.database.Score
+import com.example.wanderwise.data.local.database.CityFavorite
 import com.example.wanderwise.databinding.ListExploreCityBinding
 import com.example.wanderwise.ui.detailcity.DetailInfoCityActivity
+import com.example.wanderwise.ui.home.HomeViewModel
 
 
 class CityExploreAdapter(
     private val context: Context,
     private val cities: ArrayList<City>,
-    private val scores: MutableMap<String, Score>
+    private val scores: MutableMap<String, Score>,
+    private val homeViewModel: HomeViewModel,
+    private val cityFavorite: CityFavorite,
+    private val viewLifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<CityExploreAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -32,15 +39,23 @@ class CityExploreAdapter(
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val city = cities[position]
 
-        holder.bind(context, scores, city)
+        holder.bind(context, scores, city, homeViewModel, cityFavorite, viewLifecycleOwner)
 
         holder.itemView.setOnClickListener {
-
-
             val intent = Intent(holder.itemView.context, DetailInfoCityActivity::class.java)
             intent.putExtra(DetailInfoCityActivity.CITY, city.key.toString())
             holder.itemView.context.startActivity(intent)
         }
+
+        holder.binding.loveIcon.setOnClickListener {
+            cityFavorite.let {
+                it.key = city.key.toString()
+                it.isLoved = true
+            }
+
+            homeViewModel.insert(cityFavorite)
+        }
+
     }
 
     override fun getItemCount(): Int {
@@ -50,7 +65,17 @@ class CityExploreAdapter(
     class MyViewHolder(val binding: ListExploreCityBinding) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
-        fun bind(context: Context, scores: MutableMap<String, Score>, city: City) {
+        fun bind(context: Context, scores: MutableMap<String, Score>, city: City, homeViewModel: HomeViewModel, cityFavorite: CityFavorite, viewLifecycleOwner: LifecycleOwner) {
+
+
+            homeViewModel.getClickedCity(city.key.toString()).observe(viewLifecycleOwner) { clickedCity ->
+                if (clickedCity != null && clickedCity.key == city.key.toString()) {
+                    binding.loveIcon.setImageDrawable(ContextCompat.getDrawable(binding.loveIcon.context, R.drawable.love_fill_icon))
+                } else {
+                    binding.loveIcon.setImageDrawable(ContextCompat.getDrawable(binding.loveIcon.context, R.drawable.love_outline_icon))
+                }
+            }
+
 
             Glide.with(binding.root)
                 .load(city.image)
