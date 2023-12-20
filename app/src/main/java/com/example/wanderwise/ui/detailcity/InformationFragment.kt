@@ -16,6 +16,7 @@ import com.example.wanderwise.data.database.City
 import com.example.wanderwise.data.database.Destination
 import com.example.wanderwise.data.database.FullInfo
 import com.example.wanderwise.data.database.Information
+import com.example.wanderwise.data.database.LocationCity
 import com.example.wanderwise.data.database.Score
 import com.example.wanderwise.databinding.FragmentDestinationBinding
 import com.example.wanderwise.databinding.FragmentInformationBinding
@@ -43,7 +44,7 @@ class InformationFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentInformationBinding.inflate(inflater, container, false)
         val view = binding.root
 
@@ -66,7 +67,10 @@ class InformationFragment : Fragment() {
                 "",
                 "",
                 "",
-                ""
+                LocationCity(
+                    "",
+                    ""
+                )
             )
             val cityListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {

@@ -189,6 +189,7 @@ class HomeFragment : Fragment() {
         db.getReference("cities").get().addOnSuccessListener {
             it.children.map {city ->
                 cities.add(
+
                     City(
                         city.key,
                         city.getValue<City>()!!.area,

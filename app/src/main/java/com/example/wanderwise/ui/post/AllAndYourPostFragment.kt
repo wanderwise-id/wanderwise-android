@@ -71,7 +71,8 @@ class AllAndYourPostFragment : Fragment() {
                                     id = doc.getString("userId"),
                                     title = doc.getString("city"),
                                     idPost =  doc.getString("idPost"),
-                                    name = doc.getString("name")
+                                    name = doc.getString("name"),
+                                    photoUser = doc.getString("photo")
                                 )
                             )
                         }
@@ -102,7 +103,8 @@ class AllAndYourPostFragment : Fragment() {
                                     id = doc.getString("userId"),
                                     title = doc.getString("city"),
                                     idPost =  doc.getString("idPost"),
-                                    name = doc.getString("name")
+                                    name = doc.getString("name"),
+                                    photoUser = doc.getString("photo")
                                 )
                             )
                         }

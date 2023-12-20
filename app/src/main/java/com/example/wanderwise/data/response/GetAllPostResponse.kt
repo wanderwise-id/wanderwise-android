@@ -38,7 +38,10 @@ data class PostsItem(
 	val idPost: Any? = null,
 
 	@field:SerializedName("name")
-	val name: Any? = null
+	val name: Any? = null,
+
+	@field:SerializedName("photo")
+	val photoUser: Any? = null
 )
 
 data class CreatedAt(

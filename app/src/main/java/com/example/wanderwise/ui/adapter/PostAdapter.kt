@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
 import com.example.wanderwise.data.database.Score
@@ -63,6 +65,11 @@ class PostAdapter(
             binding.descriptionPost.text = postUser.caption.toString()
 
             binding.locationNamePost.text = postUser.title.toString()
+
+            Glide.with(binding.root)
+                .load(postUser.photoUser)
+                .transform(CenterCrop(), RoundedCorners(100))
+                .into(binding.userImage)
 
             val date = Date((postUser.createdAt.seconds.toString().toDouble() * 1000 + postUser.createdAt.nanoseconds.toString().toDouble() / 1000000).toLong())
 

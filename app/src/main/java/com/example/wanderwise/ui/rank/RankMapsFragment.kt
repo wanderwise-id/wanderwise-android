@@ -9,7 +9,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.wanderwise.R
+import com.example.wanderwise.data.database.City
+import com.example.wanderwise.data.database.LocationCity
+import com.example.wanderwise.data.database.Score
+import com.example.wanderwise.ui.adapter.CityExploreAdapter
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -19,6 +27,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 
 class RankMapsFragment : Fragment() {
     private lateinit var mMap: GoogleMap
@@ -36,20 +49,76 @@ class RankMapsFragment : Fragment() {
          * user has installed Google Play services and returned to the app.
          */
         mMap = googleMap
-        val sydney = LatLng(-8.650000, 115.216667)
-        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Denpasar"))
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        boundsBuilder.include(sydney)
-        val bounds: LatLngBounds = boundsBuilder.build()
-        mMap.animateCamera(
-            CameraUpdateFactory.newLatLngBounds(
-                bounds,
-                resources.displayMetrics.widthPixels,
-                resources.displayMetrics.heightPixels,
-                300
-            )
-        )
+        val refCities = db.getReference("cities")
+        val refScores = db.getReference("scores")
+
+        val cityListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.childrenCount > 0) {
+                    val boundsBuilder = LatLngBounds.Builder()
+
+                    dataSnapshot.children.map { citySnapshot ->
+                        val city = citySnapshot.getValue<City>()
+                        val location = citySnapshot.child("location").getValue<LocationCity>()
+
+                        if (city != null && location != null) {
+                            val latLng = LatLng(location.lat.toString().toDouble(), location.lon.toString().toDouble())
+                            boundsBuilder.include(latLng)
+
+                            val cityKey = citySnapshot.key
+                            val scoreLast: MutableMap<String, Double> = mutableMapOf() // Menggunakan Double sebagai tipe datanya
+
+                            refScores.child(cityKey.toString()).addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(scoreSnapshot: DataSnapshot) {
+                                    val score = scoreSnapshot.getValue<Score>()
+                                    if (score != null) {
+                                        scoreLast[cityKey.toString()] = score.score.toString().toDouble()
+                                    }
+
+                                    mMap.addMarker(
+                                        MarkerOptions()
+                                            .position(latLng)
+                                            .title(citySnapshot.key)
+                                            .snippet(scoreLast[cityKey.toString()].toString()) // Menggunakan nilai skor di sini
+                                    ).also { marker ->
+                                        if (marker != null) {
+                                            marker.tag = citySnapshot.key
+                                        }
+                                    }
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    Log.w("TAG", "Failed to read score value.", error.toException())
+                                }
+                            })
+
+
+                        }
+                    }
+
+                    // Animasi kamera
+                    val bounds: LatLngBounds = boundsBuilder.build()
+                    mMap.animateCamera(
+                        CameraUpdateFactory.newLatLngBounds(
+                            bounds,
+                            resources.displayMetrics.widthPixels,
+                            resources.displayMetrics.heightPixels,
+                            300
+                        )
+                    )
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("TAG", "Failed to read city value.", error.toException())
+            }
+        }
+
+        refCities.addValueEventListener(cityListener)
+
+
 
 
         setMapStyle()
