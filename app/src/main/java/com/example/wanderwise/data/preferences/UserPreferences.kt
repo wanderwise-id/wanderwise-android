@@ -22,6 +22,8 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
             preferences[TOKEN_KEY] = user.token
             preferences[EMAIL_KEY] = user.email
             preferences[UID_KEY] = user.uid
+            preferences[USER_LOCATION] = user.userLocation
+            preferences[CURRENT_ACT] = user.currentActivity
             preferences[IS_LOGIN_KEY] = true
         }
     }
@@ -33,6 +35,8 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
                 preferences[TOKEN_KEY] ?: "",
                 preferences[EMAIL_KEY] ?: "",
                 preferences[UID_KEY] ?: "",
+                preferences[USER_LOCATION] ?: "",
+                preferences[CURRENT_ACT] ?: "",
                 preferences[IS_LOGIN_KEY] ?: false
             )
         }
@@ -53,6 +57,8 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
         private val EMAIL_KEY = stringPreferencesKey("email")
         private val IS_LOGIN_KEY = booleanPreferencesKey("isLogin")
         private val UID_KEY = stringPreferencesKey("uid")
+        private val USER_LOCATION = stringPreferencesKey("userLocation")
+        private val CURRENT_ACT = stringPreferencesKey("currentLocation")
 
         fun getInstance(dataStore: DataStore<Preferences>): UserPreferences {
             return INSTANCE ?: synchronized(this) {

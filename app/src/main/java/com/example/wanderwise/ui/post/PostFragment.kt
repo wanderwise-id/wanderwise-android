@@ -6,9 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import com.example.wanderwise.R
 import com.example.wanderwise.data.response.GetAllPostResponse
 import com.example.wanderwise.ui.post.addpost.AddPostActivity
 import com.example.wanderwise.databinding.FragmentPostBinding
@@ -34,6 +36,10 @@ class PostFragment : Fragment() {
         val viewAdapter: ViewPager2 = binding.viewPager
         viewAdapter.adapter = pagerAdapter
 
+        TabLayoutMediator(binding.tabs, viewAdapter) { tab, position ->
+            tab.text = resources.getString(TAB_TITLES[position])
+        }.attach()
+
         binding.addPost.setOnClickListener {
             val intentAdd = Intent(activity, AddPostActivity::class.java)
             startActivity(intentAdd)
@@ -42,5 +48,11 @@ class PostFragment : Fragment() {
         return view
     }
 
-
+    companion object {
+        @StringRes
+        private val TAB_TITLES = intArrayOf(
+            R.string.all_post,
+            R.string.your_post
+        )
+    }
 }

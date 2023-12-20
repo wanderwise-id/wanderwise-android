@@ -1,40 +1,30 @@
 package com.example.wanderwise.ui.adapter
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.icu.text.SimpleDateFormat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.wanderwise.R
-import com.example.wanderwise.data.database.City
-import com.example.wanderwise.data.database.Score
-import com.example.wanderwise.data.response.CreatedAt
-import com.example.wanderwise.data.response.GetAllPostResponse
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.wanderwise.data.response.PostsItem
-import com.example.wanderwise.databinding.ListExploreCityBinding
+import com.example.wanderwise.databinding.ListPopularTravelerPostBinding
 import com.example.wanderwise.databinding.ListPostPageBinding
-import com.example.wanderwise.ui.detailcity.DetailInfoCityActivity
 import java.util.Date
 import java.util.Locale
 
-class PostAdapter(
+class PostHomeAdapter(
     private val context: Context,
     private val userPost: ArrayList<PostsItem>
-) : RecyclerView.Adapter<PostAdapter.MyViewHolder>() {
+) : RecyclerView.Adapter<PostHomeAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): MyViewHolder {
-        val binding = ListPostPageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ListPopularTravelerPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(binding)
     }
 
@@ -49,20 +39,21 @@ class PostAdapter(
         return userPost.size
     }
 
-    class MyViewHolder(val binding: ListPostPageBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MyViewHolder(val binding: ListPopularTravelerPostBinding) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
         fun bind(context: Context, postUser: PostsItem) {
 
             Glide.with(binding.root)
                 .load(postUser.image)
-                .into(binding.postImagePreview)
+                .transform(CenterCrop(), RoundedCorners(40))
+                .into(binding.cityPreviewPost)
 
-            binding.usernameUserPost.text = postUser.name.toString()
+            binding.descriptionPopular.text = postUser.caption.toString()
 
-            binding.descriptionPost.text = postUser.caption.toString()
+            binding.usernamePopular.text = postUser.name.toString()
 
-            binding.locationNamePost.text = postUser.title.toString()
+            binding.location.text = postUser.title.toString()
 
             val date = Date((postUser.createdAt.seconds.toString().toDouble() * 1000 + postUser.createdAt.nanoseconds.toString().toDouble() / 1000000).toLong())
 

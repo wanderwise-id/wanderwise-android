@@ -16,6 +16,7 @@ import com.example.wanderwise.databinding.FragmentInformationBinding
 import com.example.wanderwise.databinding.FragmentMitigationBinding
 import com.example.wanderwise.ui.adapter.DestinationAdapter
 import com.example.wanderwise.ui.home.HomeViewModel
+import com.example.wanderwise.utils.MyLocation
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -39,8 +40,8 @@ class MitigationFragment : Fragment() {
     ): View? {
         _binding = FragmentMitigationBinding.inflate(inflater, container, false)
         val view = binding.root
-        homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
-        val cityKey = homeViewModel.locationData
+
+        val cityKey = (requireActivity().application as MyLocation).sharedData
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 

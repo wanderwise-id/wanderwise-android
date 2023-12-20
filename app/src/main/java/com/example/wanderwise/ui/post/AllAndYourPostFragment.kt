@@ -43,46 +43,79 @@ class AllAndYourPostFragment : Fragment() {
         _binding = FragmentAllAndYourPostBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        val uidUser = postViewModel.uid
+        postViewModel.getSessionUser().observe(viewLifecycleOwner) { uid ->
+            val uidUser = uid.uid
+            val db = Firebase.firestore
 
-        val db = Firebase.firestore
+            arguments?.let {
+                position = it.getInt(ARG_POSITION)
+            }
 
-        arguments?.let {
-            position = it.getInt(ARG_POSITION)
-        }
+            if (position == 1) {
+                val userAllPosts = ArrayList<PostsItem>()
+                showLoading(true)
 
-        if (position == 1) {
+                db.collection("posts")
+                    .get()
+                    .addOnSuccessListener {
+                        it.documents.forEach() { doc ->
 
-        } else {
-            val userPosts = ArrayList<PostsItem>()
-            showLoading(true)
-            db.collection("posts").whereEqualTo("userId", uidUser)
-                .get()
-                .addOnSuccessListener {
-                    it.documents.forEach() {doc ->
-
-                        userPosts.add(
-                            PostsItem(
-                                image = doc.getString("image"),
-                                createdAt = CreatedAt(
-                                    seconds = doc.getTimestamp("createdAt")!!.seconds,
-                                    nanoseconds = doc.getTimestamp("createdAt")!!.nanoseconds
-                                ),
-                                caption = doc.getString("caption"),
-                                id = doc.getString("userId"),
-                                title = doc.getString("title"),
-                                idPost =  doc.getString("idPost")
+                            userAllPosts.add(
+                                PostsItem(
+                                    image = doc.getString("image"),
+                                    createdAt = CreatedAt(
+                                        seconds = doc.getTimestamp("createdAt")!!.seconds,
+                                        nanoseconds = doc.getTimestamp("createdAt")!!.nanoseconds
+                                    ),
+                                    caption = doc.getString("caption"),
+                                    id = doc.getString("userId"),
+                                    title = doc.getString("city"),
+                                    idPost =  doc.getString("idPost"),
+                                    name = doc.getString("name")
+                                )
                             )
-                        )
-                    }
+                        }
 
-                    showLoading(false)
-                    adapterUserPost = PostAdapter(requireContext(), userPosts)
-                    binding.rvAllYourPost.layoutManager = LinearLayoutManager(requireContext())
-                    binding.rvAllYourPost.setHasFixedSize(true)
-                    binding.rvAllYourPost.adapter = adapterUserPost
-                }
+                        showLoading(false)
+                        adapterUserPost = PostAdapter(requireContext(), userAllPosts)
+                        binding.rvAllYourPost.layoutManager = LinearLayoutManager(requireContext())
+                        binding.rvAllYourPost.setHasFixedSize(true)
+                        binding.rvAllYourPost.adapter = adapterUserPost
+                    }
+            } else {
+                val userPosts = ArrayList<PostsItem>()
+                showLoading(true)
+
+                db.collection("posts").whereEqualTo("userId", uidUser)
+                    .get()
+                    .addOnSuccessListener {
+                        it.documents.forEach() {doc ->
+
+                            userPosts.add(
+                                PostsItem(
+                                    image = doc.getString("image"),
+                                    createdAt = CreatedAt(
+                                        seconds = doc.getTimestamp("createdAt")!!.seconds,
+                                        nanoseconds = doc.getTimestamp("createdAt")!!.nanoseconds
+                                    ),
+                                    caption = doc.getString("caption"),
+                                    id = doc.getString("userId"),
+                                    title = doc.getString("city"),
+                                    idPost =  doc.getString("idPost"),
+                                    name = doc.getString("name")
+                                )
+                            )
+                        }
+
+                        showLoading(false)
+                        adapterUserPost = PostAdapter(requireContext(), userPosts)
+                        binding.rvAllYourPost.layoutManager = LinearLayoutManager(requireContext())
+                        binding.rvAllYourPost.setHasFixedSize(true)
+                        binding.rvAllYourPost.adapter = adapterUserPost
+                    }
+            }
         }
+
 
         return view
     }

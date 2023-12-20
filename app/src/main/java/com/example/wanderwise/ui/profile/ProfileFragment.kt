@@ -18,8 +18,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.example.mystoryapp.utils.reduceFileImage
 import com.example.mystoryapp.utils.uriToFile
+import com.example.wanderwise.data.Result
 import com.example.wanderwise.data.preferences.UserModel
 import com.example.wanderwise.ui.profile.smallmenu.AboutUsFragment
 import com.example.wanderwise.ui.profile.smallmenu.EmailChangeFragment
@@ -30,6 +32,7 @@ import com.example.wanderwise.ui.profile.smallmenu.SettingsChangeFragment
 import com.example.wanderwise.databinding.FragmentProfileBinding
 import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.ui.post.addpost.AddPostViewModel
+import com.google.android.material.snackbar.Snackbar
 
 
 class ProfileFragment : Fragment() {
@@ -59,8 +62,29 @@ class ProfileFragment : Fragment() {
     }
 
     private fun showImage() {
-        imagePickUri.let {uri ->
+        imagePickUri?.let { uri ->
             binding.profileImage.setImageURI(uri)
+            val image = uriToFile(uri, requireActivity()).reduceFileImage()
+
+            profileViewModel.uploadPhotoProfile(image).observe(viewLifecycleOwner) { result ->
+                if (result != null) {
+                    when (result) {
+                        is Result.Loading -> {
+                            isLoading(true)
+                        }
+
+                        is Result.Success -> {
+                            showToast(result.data)
+                            isLoading(false)
+                        }
+
+                        is Result.Error -> {
+                            showToast(result.error)
+                            isLoading(false)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -107,8 +131,42 @@ class ProfileFragment : Fragment() {
             startGallery()
         }
 
+        profileViewModel.isLoading.observe(viewLifecycleOwner) {
+            isLoading(it)
+        }
+
+        profileViewModel.snackbar.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let { SnackBarText ->
+                Snackbar.make(
+                    view,
+                    SnackBarText,
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        profileViewModel.getPhoto().observe(viewLifecycleOwner) {
+            Glide.with(requireContext())
+                .load(it.body.photo)
+                .into(binding.profileImage)
+        }
+
+        profileViewModel.getSessionUser().observe(viewLifecycleOwner) {
+            binding.usernameProfile.text = it.name
+            binding.emailUserProfile.text = it.email
+        }
+
         return view
     }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun isLoading(loading: Boolean) {
+        binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+    }
+
 
     companion object {
         private const val REQUIRED_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE

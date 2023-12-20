@@ -8,16 +8,22 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.example.mystoryapp.data.preferences.UserPreferences
 import com.example.wanderwise.R
+import com.example.wanderwise.data.local.database.CityFavorite
+import com.example.wanderwise.data.local.database.CityFavoriteDao
+import com.example.wanderwise.data.local.database.CityFavoriteDatabase
 import com.example.wanderwise.data.preferences.UserModel
+import com.example.wanderwise.data.response.BodyUpload
 import com.example.wanderwise.data.response.GetAllPostResponse
 import com.example.wanderwise.data.response.LoginResponse
 import com.example.wanderwise.data.response.RegisterResponse
 import com.example.wanderwise.data.response.UploadImageResponse
+import com.example.wanderwise.data.response.UploadPhotoResponse
 import com.example.wanderwise.data.retrofit.ApiConfig
 import com.example.wanderwise.data.retrofit.ApiService
 import com.example.wanderwise.utils.Event
 import com.google.firebase.database.FirebaseDatabase
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -31,83 +37,40 @@ import retrofit2.Callback
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.File
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class PostRepository private constructor
 (
     private val context: Context,
     private val apiService: ApiService,
-    private val preferences: UserPreferences
+    private val preferences: UserPreferences,
+    private val databaseFav: CityFavoriteDao
 ){
+
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _snackBarText = MutableLiveData<Event<String>>()
+    val snackBarText: LiveData<Event<String>> = _snackBarText
+
+
+    private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
+
     val user = runBlocking { preferences.getSession().first() }
     val userUid = user.uid
 
-//    private val _allPost = MutableLiveData<List<GetAllPostResponse>>()
-//    val allPost: LiveData<List<GetAllPostResponse>> = _allPost
-//
-//    private val _userPost = MutableLiveData<List<GetAllPostResponse>>()
-//    val userPost: LiveData<List<GetAllPostResponse>> = _userPost
-//
-//    private val _isLoading = MutableLiveData<Boolean>()
-//    val isLoading: LiveData<Boolean> = _isLoading
-//
-//    private val _snackBarText = MutableLiveData<Event<String>>()
-//    val snackBarText: LiveData<Event<String>> = _snackBarText
-//
-//    fun getAllPost() {
-//        _isLoading.value = true
-//        val user = runBlocking { preferences.getSession().first() }
-//        val client = ApiConfig.getApiService(user.token).getAllPost()
-//        client.enqueue(object : Callback<List<GetAllPostResponse>> {
-//            override fun onResponse(
-//                call: Call<List<GetAllPostResponse>>,
-//                response: Response<List<GetAllPostResponse>>
-//            ) {
-//                _isLoading.value = false
-//                if (response.isSuccessful) {
-//                    _isLoading.value = false
-//                    _allPost.value = response.body()
-//                    Log.d("TestingKesamaan", "Ini onResponse ${response.body()}")
-//                } else {
-//                    _isLoading.value = true
-//                    _snackBarText.value = Event("API request failed with code: ${response.code()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<List<GetAllPostResponse>>, t: Throwable) {
-//                _isLoading.value = true
-//                Log.d("TestingKesamaan", "Ini onFailure ${t.message}")
-//                _snackBarText.value = Event("OnFailure: ${t.message}")
-//            }
-//        })
-//    }
-//
-//    fun getUserPost() {
-//        _isLoading.value = true
-//        val user = runBlocking { preferences.getSession().first() }
-//        val client = ApiConfig.getApiService(user.token).getUserPost()
-//        client.enqueue(object : Callback<List<GetAllPostResponse>> {
-//            override fun onResponse(
-//                call: Call<List<GetAllPostResponse>>,
-//                response: Response<List<GetAllPostResponse>>
-//            ) {
-//                _isLoading.value = false
-//                if (response.isSuccessful) {
-//                    _isLoading.value = false
-//                    _userPost.value = response.body()
-//                    Log.d("TestingKesamaan", "Ini onResponse ${response.body()}")
-//                } else {
-//                    _isLoading.value = true
-//                    _snackBarText.value = Event("API request failed with code: ${response.code()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<List<GetAllPostResponse>>, t: Throwable) {
-//                _isLoading.value = true
-//                Log.d("TestingKesamaan", "Ini OnFailure ${t.message}")
-//                _snackBarText.value = Event("OnFailure: ${t.message}")
-//            }
-//        })
-//    }
+    fun getAllFav(): LiveData<List<CityFavorite>> = databaseFav.getCity()
+
+    fun getClickedCity(city: String): LiveData<CityFavorite> = databaseFav.getCityClicked(city)
+
+    fun insertCityFav(city: CityFavorite) {
+        executorService.execute { databaseFav.insertFav(city) }
+    }
+
+    fun deleteCityFav(city: CityFavorite) {
+        executorService.execute { databaseFav.deleteFav(city) }
+    }
 
     fun uploadImage(title: String, caption: String, image: File) = liveData {
         emit(Result.Loading)
@@ -132,6 +95,59 @@ class PostRepository private constructor
         } catch (e: Exception) {
             emit(Result.Error(getStringError(context)))
         }
+    }
+
+    fun uploadPhotoUser(image: File) = liveData {
+        emit(Result.Loading)
+
+        try {
+            val requestImageFile = image.asRequestBody("image/*".toMediaTypeOrNull())
+            val multipartBody = MultipartBody.Part.createFormData(
+                "image",
+                image.name,
+                requestImageFile
+            )
+
+            val user = runBlocking { preferences.getSession().first() }
+            val successRespone = ApiConfig.getApiService(user.token).uploadImage(multipartBody)
+            emit(Result.Success(successRespone.msg))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = Gson().fromJson(errorBody, UploadPhotoResponse::class.java)
+            emit(Result.Error("Sorry, ${errorResponse.msg}"))
+        } catch (e: Exception) {
+            emit(Result.Error(getStringError(context)))
+        }
+    }
+
+    fun getImage(): LiveData<UploadPhotoResponse> {
+        _isLoading.value = true
+        val detail = MutableLiveData<UploadPhotoResponse>()
+
+        val user = runBlocking { preferences.getSession().first() }
+        val uploadImageResponse = ApiConfig.getApiService(user.token).getPhotoProfile()
+
+        uploadImageResponse.enqueue(object : Callback<UploadPhotoResponse> {
+            override fun onResponse(
+                call: Call<UploadPhotoResponse>,
+                response: Response<UploadPhotoResponse>
+            ) {
+                if (response.isSuccessful) {
+                    _isLoading.value = false
+                    detail.value = response.body()
+                } else {
+                    _isLoading.value = false
+                    _snackBarText.value = Event(getStringError(context))
+                }
+            }
+
+            override fun onFailure(call: Call<UploadPhotoResponse>, t: Throwable) {
+                _isLoading.value = false
+                _snackBarText.value = Event("${t.message}")
+            }
+        })
+
+        return detail
     }
 
     fun registerUser(name: String, email: String, password: String) = liveData {
@@ -160,7 +176,7 @@ class PostRepository private constructor
             val uidUser = successResponse.body.uid
             val isLogin = true
             Log.d("tokenCheck", token)
-            saveSession(UserModel(name, token, emailUser, uidUser, isLogin))
+            saveSession(UserModel(name, token, emailUser, uidUser, "Location", "profile", isLogin))
             emit(Result.Success("Thanks ${successResponse.body.name} for the Login!"))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -169,7 +185,7 @@ class PostRepository private constructor
         }
     }
 
-    private suspend fun saveSession(userModel: UserModel){
+    suspend fun saveSession(userModel: UserModel){
         preferences.saveSession(userModel)
     }
 
@@ -189,9 +205,9 @@ class PostRepository private constructor
         @SuppressLint("StaticFieldLeak")
         @Volatile
         private var instance: PostRepository? = null
-        fun getInstance(context: Context, apiService: ApiService, preferences: UserPreferences) =
+        fun getInstance(context: Context, apiService: ApiService, preferences: UserPreferences, databaseFav: CityFavoriteDao) =
             instance ?: synchronized(this) {
-                instance ?: PostRepository(context, apiService, preferences)
+                instance ?: PostRepository(context, apiService, preferences, databaseFav)
             }.also { instance = it }
     }
 }

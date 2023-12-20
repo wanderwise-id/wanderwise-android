@@ -26,7 +26,7 @@ class LoginScreenActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         loginViewModel.getSessionUser().observe(this) { user ->
-            if (user.isLogin) {
+            if (user.token.isNotEmpty()) {
                 val intent = Intent(this, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)

@@ -4,6 +4,7 @@ import com.example.wanderwise.data.response.GetAllPostResponse
 import com.example.wanderwise.data.response.LoginResponse
 import com.example.wanderwise.data.response.RegisterResponse
 import com.example.wanderwise.data.response.UploadImageResponse
+import com.example.wanderwise.data.response.UploadPhotoResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -11,7 +12,9 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 
 interface ApiService {
@@ -19,7 +22,7 @@ interface ApiService {
     @Multipart
     @POST("posts")
     suspend fun uploadImage(
-        @Part("title") title: RequestBody,
+        @Part("city") title: RequestBody,
         @Part("caption") caption: RequestBody,
         @Part file: MultipartBody.Part
     ): UploadImageResponse
@@ -39,10 +42,13 @@ interface ApiService {
         @Field("password") password: String
     ): LoginResponse
 
-//    @GET("posts/home")
-//    fun getAllPost(): Call<List<GetAllPostResponse>>
-//
-//    @GET("posts")
-//    fun getUserPost(): Call<List<GetAllPostResponse>>
+    @Multipart
+    @PUT("auth/user")
+    suspend fun uploadImage(
+        @Part file: MultipartBody.Part
+    ): UploadPhotoResponse
+
+    @GET("auth/user")
+    fun getPhotoProfile(): Call<UploadPhotoResponse>
 
 }

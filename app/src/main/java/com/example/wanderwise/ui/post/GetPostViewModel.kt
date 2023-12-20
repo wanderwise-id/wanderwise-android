@@ -16,18 +16,7 @@ class GetPostViewModel(private val pRepository: PostRepository): ViewModel() {
 
     val uid = pRepository.userUid
 
-//    val snackbar: LiveData<Event<String>> = pRepository.snackBarText
-//
-//    val isLoading: LiveData<Boolean> = pRepository.isLoading
-//
-//    val allPost = pRepository.allPost
-//    val allUser = pRepository.userPost
-//
-//    fun getAllPosts() {
-//        pRepository.getAllPost()
-//    }
-//
-//    fun getUserPost() {
-//        pRepository.getUserPost()
-//    }
+    fun getSessionUser(): LiveData<UserModel> {
+        return pRepository.getSession().asLiveData()
+    }
 }

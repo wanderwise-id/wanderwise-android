@@ -20,6 +20,7 @@ import com.example.wanderwise.databinding.FragmentNewsBinding
 import com.example.wanderwise.ui.adapter.DestinationAdapter
 import com.example.wanderwise.ui.detailcity.news.CrimeCategoryDetailActivity
 import com.example.wanderwise.ui.home.HomeViewModel
+import com.example.wanderwise.utils.MyLocation
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -40,9 +41,7 @@ class NewsFragment : Fragment() {
         _binding = FragmentNewsBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
-
-        val cityKey = homeViewModel.locationData
+        val cityKey = (requireActivity().application as MyLocation).sharedData
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
         val ref = db.getReference("news/${cityKey}")
@@ -57,17 +56,20 @@ class NewsFragment : Fragment() {
                     )
                 }
 
-                Glide.with(requireActivity())
-                    .load(R.drawable.crime_image)
-                    .transform(CenterCrop(), RoundedCorners(40))
-                    .into(binding.imagePreviewNews)
+                if (newsAmount.size > 0) {
+                    Glide.with(requireActivity())
+                        .load(R.drawable.crime_image)
+                        .transform(CenterCrop(), RoundedCorners(40))
+                        .into(binding.imagePreviewNews)
 
-                binding.notifAmount.text = newsAmount.size.toString()
+                    binding.notifAmount.text = newsAmount.size.toString()
 
-                binding.crimeCard.setOnClickListener {
-                    val intentCrimeNews = Intent(activity, CrimeCategoryDetailActivity::class.java)
-                    startActivity(intentCrimeNews)
+                    binding.crimeCard.setOnClickListener {
+                        val intentCrimeNews = Intent(activity, CrimeCategoryDetailActivity::class.java)
+                        startActivity(intentCrimeNews)
+                    }
                 }
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

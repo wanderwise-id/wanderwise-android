@@ -12,13 +12,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.mystoryapp.data.preferences.UserPreferences
+import com.example.mystoryapp.data.preferences.dataStore
 import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
 import com.example.wanderwise.data.database.Score
 import com.example.wanderwise.data.database.Weather
+import com.example.wanderwise.data.preferences.UserModel
 import com.example.wanderwise.databinding.ListExploreCityBinding
 import com.example.wanderwise.ui.detailcity.DestinationFragment
 import com.example.wanderwise.ui.detailcity.DetailInfoCityActivity
+import com.example.wanderwise.utils.MyLocation
 
 
 class CityExploreAdapter(
@@ -41,6 +45,8 @@ class CityExploreAdapter(
         holder.bind(context, scores, city)
 
         holder.itemView.setOnClickListener {
+
+
             val intent = Intent(holder.itemView.context, DetailInfoCityActivity::class.java)
             intent.putExtra(DetailInfoCityActivity.CITY, city.key.toString())
             holder.itemView.context.startActivity(intent)

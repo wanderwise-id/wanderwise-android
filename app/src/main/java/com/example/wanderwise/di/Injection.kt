@@ -4,6 +4,8 @@ import android.content.Context
 import com.example.mystoryapp.data.preferences.UserPreferences
 import com.example.mystoryapp.data.preferences.dataStore
 import com.example.wanderwise.data.PostRepository
+import com.example.wanderwise.data.local.database.CityFavoriteDao
+import com.example.wanderwise.data.local.database.CityFavoriteDatabase
 import com.example.wanderwise.data.retrofit.ApiConfig
 import com.example.wanderwise.data.retrofit.ApiService
 import com.google.firebase.Firebase
@@ -19,8 +21,10 @@ object Injection {
         val pref = UserPreferences.getInstance(context.dataStore)
         val user = runBlocking { pref.getSession().first()}
         val apiService = ApiConfig.getApiService(user.token)
+        val db = CityFavoriteDatabase.getInstance(context)
+        val userDao = db.cityFavDao()
 
-        return PostRepository.getInstance(context, apiService, pref)
+        return PostRepository.getInstance(context, apiService, pref, userDao)
     }
 
 }

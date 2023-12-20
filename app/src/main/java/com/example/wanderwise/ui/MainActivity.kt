@@ -8,18 +8,22 @@ import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat.requestLocationUpdates
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.wanderwise.R
+import com.example.wanderwise.data.preferences.UserModel
 import com.example.wanderwise.databinding.ActivityMainBinding
 import com.example.wanderwise.ui.home.HomeFragment
+import com.example.wanderwise.ui.profile.ProfileViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
@@ -33,6 +37,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val profileViewModel by viewModels<ProfileViewModel> {
+        ViewModelFactory.getInstance(this)
+    }
 
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,7 +102,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestLocationUpdates() {
-        // Check if the necessary location permissions are granted
+        //Check if the necessary location permissions are granted
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -108,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Request location updates
+        //Request location updates
         fusedLocationClient.requestLocationUpdates(
             getLocationRequest(),
             locationCallback,
@@ -117,9 +124,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getLocationRequest(): LocationRequest {
+        var interval = 6000*5
+        profileViewModel.getSessionUser().observe(this@MainActivity) {
+            if (it.userLocation.isEmpty()) {
+                interval = 0
+            }
+        }
         return LocationRequest.create()
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-            .setInterval(1000) // Update location every 1 second (adjust as needed)
+            .setInterval(interval.toLong()) //Update location every 5 minutes
     }
 
     private val locationCallback = object : LocationCallback() {
@@ -141,7 +154,6 @@ class MainActivity : AppCompatActivity() {
             // Handle location availability changes if needed
         }
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -175,9 +187,22 @@ class MainActivity : AppCompatActivity() {
         try {
             val addresses = geocoder.getFromLocation(latitude, longitude, 1)
             if (addresses?.isNotEmpty() == true) {
-                val cityName = addresses[0].subAdminArea.replace(Regex("(Kota|City)"), "").replace(Regex("\\s+"), "")
+                val cityName = addresses[0].subAdminArea.replace(Regex("(Kota|City|Kabupaten)"), "").replace(Regex("\\s+"), "")
                 Log.d("LocationCityName", "City Name: $cityName")
-                // Store to DataStore : store the variable caled cityName to datastore
+
+                profileViewModel.getSessionUser().observe(this@MainActivity) { user ->
+                    profileViewModel.editUserModel(UserModel(
+                        name = user.name,
+                        token = user.token,
+                        email = user.email,
+                        uid = user.uid,
+                        userLocation = cityName,
+                        currentActivity = "profile",
+                        isLogin = true
+                    ))
+                }
+
+                //Store to DataStore : store the variable caled cityName to datastore
             } else {
                 Log.d("Location", "No address found")
             }

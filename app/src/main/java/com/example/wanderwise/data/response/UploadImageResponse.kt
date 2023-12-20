@@ -34,7 +34,7 @@ data class Post(
 	@field:SerializedName("caption")
 	val caption: String,
 
-	@field:SerializedName("title")
+	@field:SerializedName("city")
 	val title: String,
 
 	@field:SerializedName("userId")

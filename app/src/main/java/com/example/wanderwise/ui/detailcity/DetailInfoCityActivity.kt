@@ -14,6 +14,7 @@ import com.example.wanderwise.databinding.ActivityDetailInfoCityBinding
 import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.ui.adapter.SectionPagerAdapter
 import com.example.wanderwise.ui.home.HomeViewModel
+import com.example.wanderwise.utils.MyLocation
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -25,9 +26,6 @@ class DetailInfoCityActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDetailInfoCityBinding
     private var cityKey: String? = null
     private var keyCity: String? = null
-    private val homeViewModel by viewModels<HomeViewModel> {
-        ViewModelFactory.getInstance(this)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,10 +33,8 @@ class DetailInfoCityActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         cityKey = intent.getStringExtra(CITY)
-
         keyCity = intent.getStringExtra(KEY_CITY)
-
-        homeViewModel.locationData = cityKey
+        (this.application as MyLocation).sharedData = cityKey.toString()
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
@@ -71,6 +67,7 @@ class DetailInfoCityActivity : AppCompatActivity() {
                             .load(it.image)
                             .into(binding.cityPhoto)
                         binding.descriptionSummary.text = it.description.toString()
+
                     } else if (it.key == cityKey) {
                         val titleCity = it.key.toString()
 

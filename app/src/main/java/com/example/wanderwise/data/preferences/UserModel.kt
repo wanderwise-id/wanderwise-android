@@ -7,5 +7,7 @@ data class UserModel(
     val token: String,
     val email: String,
     val uid: String,
+    val userLocation: String,
+    val currentActivity: String,
     val isLogin: Boolean = false
 )

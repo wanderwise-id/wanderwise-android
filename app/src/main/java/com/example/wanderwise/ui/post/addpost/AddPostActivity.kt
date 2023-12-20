@@ -19,11 +19,14 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresExtension
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentTransaction
 import com.example.mystoryapp.utils.reduceFileImage
 import com.example.mystoryapp.utils.uriToFile
+import com.example.wanderwise.R
 import com.example.wanderwise.databinding.ActivityAddPostBinding
 import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.data.Result
+import com.example.wanderwise.ui.post.PostFragment
 import com.example.wanderwise.ui.profile.ProfileFragment
 
 class AddPostActivity : AppCompatActivity() {
@@ -94,6 +97,11 @@ class AddPostActivity : AppCompatActivity() {
                             is Result.Success -> {
                                 showToast(result.data)
                                 isLoading(false)
+
+                                binding.captionEdit.text = null
+                                binding.cityEdit.text = null
+                                binding.pickImageButton.setImageURI(null)
+                                onBackPressed()
                             }
 
                             is Result.Error -> {
@@ -108,6 +116,23 @@ class AddPostActivity : AppCompatActivity() {
 
         supportActionBar?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#FFFFFF")))
         supportActionBar?.title = "Add post"
+    }
+
+    private fun navigateToYourFragment() {
+        // Create an instance of the fragment you want to navigate to
+        val newFragment = PostFragment()
+
+        // Start a fragment transaction
+        val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
+
+        // Replace the current fragment with the new one
+        transaction.replace(R.id.container_fragment, newFragment, "another_fragment_tag")
+
+        // Optionally, add the transaction to the back stack
+        transaction.addToBackStack(null)
+
+        // Commit the transaction
+        transaction.commit()
     }
 
     private fun showToast(message: String) {

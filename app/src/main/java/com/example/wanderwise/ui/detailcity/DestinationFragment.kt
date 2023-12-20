@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +20,7 @@ import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.ui.adapter.CityExploreAdapter
 import com.example.wanderwise.ui.adapter.DestinationAdapter
 import com.example.wanderwise.ui.home.HomeViewModel
+import com.example.wanderwise.utils.MyLocation
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -32,8 +34,6 @@ class DestinationFragment : Fragment() {
     private var _binding: FragmentDestinationBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var homeViewModel: HomeViewModel
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,10 +41,8 @@ class DestinationFragment : Fragment() {
         _binding = FragmentDestinationBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        homeViewModel = ViewModelProvider(requireActivity())[HomeViewModel::class.java]
+        val cityKey = (requireActivity().application as MyLocation).sharedData
 
-        val cityKey = homeViewModel.locationData
-        Log.d("IsiLokasiData", "$cityKey")
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
         val ref = db.getReference("destinations/${cityKey}")

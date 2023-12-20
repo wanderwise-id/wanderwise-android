@@ -1,19 +1,31 @@
 package com.example.wanderwise.ui.home
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.wanderwise.data.PostRepository
 import com.example.wanderwise.data.preferences.UserModel
 import com.example.wanderwise.utils.Event
+import kotlinx.coroutines.launch
+import java.io.File
 
 class HomeViewModel (private val pRepository: PostRepository): ViewModel() {
+
     fun getSessionUser(): LiveData<UserModel> {
         return pRepository.getSession().asLiveData()
+    }
+
+    fun editUserModel(userModel: UserModel) {
+        viewModelScope.launch {
+            pRepository.saveSession(userModel)
+        }
     }
 
     var locationData: String? = ""
     var safetyScore: Any? = null
 
-    var detailLocation: String? = ""
+    val sharedData = MutableLiveData<String>()
+
 }
