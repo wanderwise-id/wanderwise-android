@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.wanderwise.R
@@ -26,6 +27,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class DestinationFragment : Fragment() {
 
@@ -45,23 +48,31 @@ class DestinationFragment : Fragment() {
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        val destinations = ArrayList<Destination>()
-        db.getReference("destinations/${cityKey}").get().addOnSuccessListener{data ->
-            data.children.map {
-                destinations.add(
-                    Destination(
-                        it.key,
-                        it.getValue<Destination>()!!.image,
-                        it.getValue<Destination>()!!.location,
-                        it.getValue<Destination>()!!.name
-                    )
-                )
-            }
+        try {
+            lifecycleScope.launch{
+                val destinationsSnapshot = db.getReference("destinations/${cityKey}").get().await()
+                val destinations = ArrayList<Destination>()
 
-            cityAdapter = DestinationAdapter(destinations)
-            binding.rvDestination.layoutManager = LinearLayoutManager(requireContext())
-            binding.rvDestination.setHasFixedSize(true)
-            binding.rvDestination.adapter = cityAdapter
+                if (destinationsSnapshot.hasChildren()){
+                    destinationsSnapshot.children.map {
+                        destinations.add(
+                            Destination(
+                                it.key,
+                                it.getValue<Destination>()!!.image,
+                                it.getValue<Destination>()!!.location,
+                                it.getValue<Destination>()!!.name
+                            )
+                        )
+                    }
+                }
+
+                cityAdapter = DestinationAdapter(destinations)
+                binding.rvDestination.layoutManager = LinearLayoutManager(requireContext())
+                binding.rvDestination.setHasFixedSize(true)
+                binding.rvDestination.adapter = cityAdapter
+            }
+        } catch (e: Exception) {
+            Log.e("Error", "Failed to fetch data: ${e.message}")
         }
 
         return view

@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -31,6 +32,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class CrimeCategoryDetailActivity : AppCompatActivity() {
 
@@ -51,27 +54,33 @@ class CrimeCategoryDetailActivity : AppCompatActivity() {
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        val newsDetails = ArrayList<Crime>()
-        db.getReference("news/${cityKey}/Crime").get().addOnSuccessListener {
-            it.children.map {dataSnapshot ->
-                newsDetails.add(
-                    Crime(
-                        dataSnapshot.key,
-                        dataSnapshot.getValue<Crime>()!!.category,
-                        dataSnapshot.getValue<Crime>()!!.date_published,
-                        dataSnapshot.getValue<Crime>()!!.image,
-                        dataSnapshot.getValue<Crime>()!!.location,
-                        dataSnapshot.getValue<Crime>()!!.summarize,
-                        dataSnapshot.getValue<Crime>()!!.timezone,
-                        dataSnapshot.getValue<Crime>()!!.title
-                    )
-                )
-            }
+        try {
+            lifecycleScope.launch {
+                val newsDetails = ArrayList<Crime>()
+                val categorySnapshot = db.getReference("news/${cityKey}/Crime").get().await()
 
-            crimeNewsAdapter = CrimeCategoryNewsAdapter(this@CrimeCategoryDetailActivity, newsDetails)
-            binding.rvCrimeCategoryNews.layoutManager = LinearLayoutManager(this@CrimeCategoryDetailActivity)
-            binding.rvCrimeCategoryNews.setHasFixedSize(true)
-            binding.rvCrimeCategoryNews.adapter = crimeNewsAdapter
+                categorySnapshot.children.map {dataSnapshot ->
+                    newsDetails.add(
+                        Crime(
+                            dataSnapshot.key,
+                            dataSnapshot.getValue<Crime>()!!.category,
+                            dataSnapshot.getValue<Crime>()!!.date_published,
+                            dataSnapshot.getValue<Crime>()!!.image,
+                            dataSnapshot.getValue<Crime>()!!.location,
+                            dataSnapshot.getValue<Crime>()!!.summarize,
+                            dataSnapshot.getValue<Crime>()!!.timezone,
+                            dataSnapshot.getValue<Crime>()!!.title
+                        )
+                    )
+                }
+
+                crimeNewsAdapter = CrimeCategoryNewsAdapter(this@CrimeCategoryDetailActivity, newsDetails)
+                binding.rvCrimeCategoryNews.layoutManager = LinearLayoutManager(this@CrimeCategoryDetailActivity)
+                binding.rvCrimeCategoryNews.setHasFixedSize(true)
+                binding.rvCrimeCategoryNews.adapter = crimeNewsAdapter
+            }
+        } catch (e: Exception) {
+            Log.e("Error", "Failed to fetch data: ${e.message}")
         }
 
         supportActionBar?.hide()

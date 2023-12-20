@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
@@ -22,6 +23,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class MitigationFragment : Fragment() {
 
@@ -45,14 +48,20 @@ class MitigationFragment : Fragment() {
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        db.getReference("mitigations/${cityKey}").get().addOnSuccessListener {
-            if(it.childrenCount > 0){
-                binding.mitigationInfo.text = it.getValue<Mitigation>()!!.content.toString()
-                binding.mitigationHead.text = it.getValue<Mitigation>()!!.head.toString()
-            } else{
-                binding.mitigationInfo.text = "Tidak Ada Informasi Mitigasi"
-                binding.mitigationHead.text = "~"
+        try {
+            lifecycleScope.launch{
+                val mitigationSnapshot = db.getReference("mitigations/${cityKey}").get().await()
+
+                if(mitigationSnapshot.childrenCount > 0){
+                    binding.mitigationInfo.text = mitigationSnapshot.getValue<Mitigation>()!!.content.toString()
+                    binding.mitigationHead.text = mitigationSnapshot.getValue<Mitigation>()!!.head.toString()
+                } else{
+                    binding.mitigationInfo.text = "Tidak Ada Informasi Mitigasi"
+                    binding.mitigationHead.text = "~"
+                }
             }
+        } catch (e: Exception) {
+            Log.e("Error", "Failed to fetch data: ${e.message}")
         }
 
         return view
