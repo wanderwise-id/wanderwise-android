@@ -13,6 +13,7 @@ import com.example.wanderwise.data.database.DataNeed
 import com.example.wanderwise.data.database.Information
 import com.example.wanderwise.data.database.Score
 import com.example.wanderwise.data.database.Weather
+import com.example.wanderwise.data.local.database.CityFavorite
 import com.example.wanderwise.databinding.ActivityFavoriteBinding
 import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.ui.adapter.DetailListCityAdapter
@@ -61,10 +62,10 @@ class FavoriteActivity : AppCompatActivity() {
                         val informationSnapshot = db.getReference("informations/${it.key}").limitToLast(1).get().await()
 
                         if (informationSnapshot.hasChildren()){
-                            informationSnapshot.children.forEach{
-                                cities[it.key]?.numberOfDestination = informationSnapshot.getValue<Information>()!!.numberOfDestinations
-                                cities[it.key]?.numberOfHospitals = informationSnapshot.getValue<Information>()!!.numberOfHospitals
-                                cities[it.key]?.numberOfPoliceStations = informationSnapshot.getValue<Information>()!!.numberOfPoliceStations
+                            informationSnapshot.children.forEach{information ->
+                                cities[it.key]?.numberOfDestination = information.getValue<Information>()!!.numberOfDestinations
+                                cities[it.key]?.numberOfHospitals = information.getValue<Information>()!!.numberOfHospitals
+                                cities[it.key]?.numberOfPoliceStations = information.getValue<Information>()!!.numberOfPoliceStations
                             }
                         }
 
@@ -83,7 +84,14 @@ class FavoriteActivity : AppCompatActivity() {
                             }
                         }
                     }
-                    detailListCityAdapter = DetailListCityAdapter(this, cities)
+
+                    val cityFavorite: CityFavorite = CityFavorite(
+                        id = 0,
+                        key = "",
+                        isLoved = false
+                    )
+
+                    detailListCityAdapter = DetailListCityAdapter(homeViewModel,this@FavoriteActivity, cities, cityFavorite)
                     binding.rvCityLove.layoutManager = LinearLayoutManager(this@FavoriteActivity)
                     binding.rvCityLove.setHasFixedSize(true)
                     binding.rvCityLove.adapter = detailListCityAdapter
