@@ -52,7 +52,7 @@ class HomeFragment : Fragment() {
     private lateinit var cityAdapter: CityExploreAdapter
 
     private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding!! ?: throw IllegalStateException("Binding is null")
 
     private val homeViewModel by viewModels<HomeViewModel> {
         ViewModelFactory.getInstance(requireActivity())
@@ -92,16 +92,18 @@ class HomeFragment : Fragment() {
             val ref = db.getReference("cities/${currentLoc}")
             val cityListener = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        binding.locationName.text = dataSnapshot.key.toString()
-                        Glide.with(requireActivity())
-                            .load(dataSnapshot.getValue<City>()!!.image.toString())
-                            .transform(CenterCrop(), RoundedCorners(40))
-                            .into(binding.cityImage)
-                    } else {
-                        binding.locationName.text = "Unlisted"
-                        binding.cityImage.setImageResource(R.drawable.baseline_warning_image)
-                        disableDetailAccess = true
+                    if (binding != null){
+                        if (dataSnapshot.exists()) {
+                            binding.locationName.text = dataSnapshot.key.toString()
+                            Glide.with(requireActivity())
+                                .load(dataSnapshot.getValue<City>()!!.image.toString())
+                                .transform(CenterCrop(), RoundedCorners(40))
+                                .into(binding.cityImage)
+                        } else {
+                            binding.locationName.text = "Unlisted"
+                            binding.cityImage.setImageResource(R.drawable.baseline_warning_image)
+                            disableDetailAccess = true
+                        }
                     }
                 }
 
