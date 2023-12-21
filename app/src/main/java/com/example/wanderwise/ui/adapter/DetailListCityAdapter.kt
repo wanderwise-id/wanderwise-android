@@ -81,6 +81,9 @@ class DetailListCityAdapter(
                 "cloudy" -> {
                     binding.weatherIcon.setImageResource(R.drawable.cloudy)
                 }
+                "windy" -> {
+                    binding.weatherIcon.setImageResource(R.drawable.windy)
+                }
             }
 
             if (city.score != null) {

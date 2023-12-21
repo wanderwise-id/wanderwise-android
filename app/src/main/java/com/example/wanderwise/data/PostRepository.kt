@@ -141,7 +141,7 @@ class PostRepository private constructor
 
         try {
             val user = runBlocking { preferences.getSession().first() }
-            val successRespone = ApiConfig.getApiService(user.token).updateName(email)
+            val successRespone = ApiConfig.getApiService(user.token).updateEmail(email)
             emit(Result.Success(successRespone.msg))
         } catch (e: HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
@@ -158,6 +158,36 @@ class PostRepository private constructor
 
         val user = runBlocking { preferences.getSession().first() }
         val uploadImageResponse = ApiConfig.getApiService(user.token).getPhotoProfile()
+
+        uploadImageResponse.enqueue(object : Callback<UploadPhotoResponse> {
+            override fun onResponse(
+                call: Call<UploadPhotoResponse>,
+                response: Response<UploadPhotoResponse>
+            ) {
+                if (response.isSuccessful) {
+                    _isLoading.value = false
+                    detail.value = response.body()
+                } else {
+                    _isLoading.value = false
+                    _snackBarText.value = Event(getStringError(context))
+                }
+            }
+
+            override fun onFailure(call: Call<UploadPhotoResponse>, t: Throwable) {
+                _isLoading.value = false
+                _snackBarText.value = Event("${t.message}")
+            }
+        })
+
+        return detail
+    }
+
+    fun getProfileUser(): LiveData<UploadPhotoResponse> {
+        _isLoading.value = true
+        val detail = MutableLiveData<UploadPhotoResponse>()
+
+        val user = runBlocking { preferences.getSession().first() }
+        val uploadImageResponse = ApiConfig.getApiService(user.token).getUserProfile()
 
         uploadImageResponse.enqueue(object : Callback<UploadPhotoResponse> {
             override fun onResponse(

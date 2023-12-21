@@ -47,6 +47,8 @@ class EmailChangeFragment : DialogFragment() {
                         is Result.Success -> {
                             showToast(result.data)
                             isLoading(false)
+
+                            dismiss()
                         }
 
                         is Result.Error -> {

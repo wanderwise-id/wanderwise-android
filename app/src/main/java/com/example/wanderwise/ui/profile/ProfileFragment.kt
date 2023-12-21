@@ -152,9 +152,9 @@ class ProfileFragment : Fragment() {
                 .into(binding.profileImage)
         }
 
-        profileViewModel.getSessionUser().observe(viewLifecycleOwner) {
-            binding.usernameProfile.text = it.name
-            binding.emailUserProfile.text = it.email
+        profileViewModel.getUserProfile().observe(viewLifecycleOwner) {
+            binding.usernameProfile.text = it.body.name
+            binding.emailUserProfile.text = it.body.email
         }
 
         return view
@@ -166,10 +166,5 @@ class ProfileFragment : Fragment() {
 
     private fun isLoading(loading: Boolean) {
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
-    }
-
-
-    companion object {
-        private const val REQUIRED_PERMISSION = Manifest.permission.READ_EXTERNAL_STORAGE
     }
 }

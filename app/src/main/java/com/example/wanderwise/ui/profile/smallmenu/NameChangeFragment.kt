@@ -9,6 +9,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.wanderwise.R
 import com.example.wanderwise.data.Result
+import com.example.wanderwise.data.preferences.UserModel
 import com.example.wanderwise.databinding.FragmentNameChangeBinding
 import com.example.wanderwise.databinding.FragmentRankBinding
 import com.example.wanderwise.ui.ViewModelFactory
@@ -47,6 +48,8 @@ class NameChangeFragment : DialogFragment() {
                         is Result.Success -> {
                             showToast(result.data)
                             isLoading(false)
+
+                            dismiss()
                         }
 
                         is Result.Error -> {

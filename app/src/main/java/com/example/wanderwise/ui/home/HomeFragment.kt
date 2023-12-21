@@ -148,6 +148,9 @@ class HomeFragment : Fragment() {
                             "cloudy" -> {
                                 binding.weatherIcon.setImageResource(R.drawable.cloudy)
                             }
+                            "windy" -> {
+                                binding.weatherIcon.setImageResource(R.drawable.windy)
+                            }
                         }
                     }
                 }

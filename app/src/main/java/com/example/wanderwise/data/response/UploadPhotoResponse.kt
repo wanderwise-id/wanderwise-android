@@ -16,6 +16,9 @@ data class UploadPhotoResponse(
 
 data class BodyUpload(
 
+	@field:SerializedName("uid")
+	val uid: String,
+
 	@field:SerializedName("phone")
 	val phone: String,
 

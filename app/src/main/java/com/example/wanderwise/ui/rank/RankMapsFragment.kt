@@ -23,6 +23,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -49,6 +50,11 @@ class RankMapsFragment : Fragment() {
          * user has installed Google Play services and returned to the app.
          */
         mMap = googleMap
+
+        val rankSatu = BitmapDescriptorFactory.fromResource(R.drawable.rank1)
+        val rankDua = BitmapDescriptorFactory.fromResource(R.drawable.rank2)
+        val rankTiga = BitmapDescriptorFactory.fromResource(R.drawable.rank3)
+
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
         val refCities = db.getReference("cities")
@@ -57,18 +63,15 @@ class RankMapsFragment : Fragment() {
         val cityListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.childrenCount > 0) {
-                    val boundsBuilder = LatLngBounds.Builder()
 
                     dataSnapshot.children.map { citySnapshot ->
                         val city = citySnapshot.getValue<City>()
                         val location = citySnapshot.child("location").getValue<LocationCity>()
 
                         if (city != null && location != null) {
-                            val latLng = LatLng(location.lat.toString().toDouble(), location.lon.toString().toDouble())
-                            boundsBuilder.include(latLng)
 
                             val cityKey = citySnapshot.key
-                            val scoreLast: MutableMap<String, Int> = mutableMapOf() // Menggunakan Double sebagai tipe datanya
+                            val scoreLast: MutableMap<String, Int> = mutableMapOf()
 
                             refScores.child(cityKey.toString()).limitToLast(1).addListenerForSingleValueEvent(object : ValueEventListener {
                                 override fun onDataChange(scoreSnapshot: DataSnapshot) {
@@ -81,15 +84,56 @@ class RankMapsFragment : Fragment() {
                                             }
                                         }
 
-                                        mMap.addMarker(
-                                            MarkerOptions()
-                                                .position(latLng)
-                                                .title(citySnapshot.key)
-                                                .snippet(scoreLast[cityKey.toString()].toString()) // Menggunakan nilai skor di sini
-                                        ).also { marker ->
-                                            if (marker != null) {
-                                                marker.tag = citySnapshot.key
+                                        val sortedEntries = scoreLast.entries.sortedByDescending { it.value }
+                                        val top3Entries = sortedEntries.take(3)
+
+                                        val boundsBuilder = LatLngBounds.Builder()
+
+// Initialize a counter for ranking
+                                        var rankCounter = 0
+
+                                        for ((key, value) in top3Entries) {
+                                            // Move the creation of LatLng inside the loop
+                                            val markerLatLng = LatLng(location.lat.toString().toDouble(), location.lon.toString().toDouble())
+
+                                            val customMarker = when (rankCounter) {
+                                                0 -> rankSatu
+                                                1 -> rankDua
+                                                2 -> rankTiga
+                                                else -> throw IllegalStateException("Unexpected rankCounter: $rankCounter")
                                             }
+
+                                            mMap.addMarker(
+                                                MarkerOptions()
+                                                    .position(markerLatLng)
+                                                    .title(key)
+                                                    .snippet(value.toString())
+                                                    .icon(customMarker)
+                                            ).also { marker ->
+                                                if (marker != null) {
+                                                    marker.tag = key
+                                                }
+                                            }
+
+                                            // Increment the rankCounter
+                                            rankCounter++
+                                        }
+
+// Check if there are included points before building LatLngBounds
+                                        if (boundsBuilder.build().southwest.latitude != boundsBuilder.build().northeast.latitude) {
+                                            // Animasi kamera
+                                            val bounds: LatLngBounds = boundsBuilder.build()
+                                            mMap.animateCamera(
+                                                CameraUpdateFactory.newLatLngBounds(
+                                                    bounds,
+                                                    resources.displayMetrics.widthPixels,
+                                                    resources.displayMetrics.heightPixels,
+                                                    300
+                                                )
+                                            )
+                                        } else {
+                                            // Handle the case where there are no included points
+                                            Log.e("TAG", "No included points to build LatLngBounds.")
                                         }
                                     }
                                 }
@@ -98,21 +142,8 @@ class RankMapsFragment : Fragment() {
                                     Log.w("TAG", "Failed to read score value.", error.toException())
                                 }
                             })
-
-
                         }
                     }
-
-                    // Animasi kamera
-                    val bounds: LatLngBounds = boundsBuilder.build()
-                    mMap.animateCamera(
-                        CameraUpdateFactory.newLatLngBounds(
-                            bounds,
-                            resources.displayMetrics.widthPixels,
-                            resources.displayMetrics.heightPixels,
-                            300
-                        )
-                    )
                 }
             }
 

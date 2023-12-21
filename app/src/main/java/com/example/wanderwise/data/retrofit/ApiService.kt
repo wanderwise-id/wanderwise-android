@@ -49,18 +49,21 @@ interface ApiService {
     ): UploadPhotoResponse
 
     @FormUrlEncoded
-    @PUT("auth/user")
+    @PUT("auth/username")
     suspend fun updateName(
         @Field("name") name: String
     ): UploadPhotoResponse
 
     @FormUrlEncoded
-    @PUT("auth/user")
+    @PUT("auth/useremail")
     suspend fun updateEmail(
         @Field("email") email: String
     ): UploadPhotoResponse
 
     @GET("auth/user")
     fun getPhotoProfile(): Call<UploadPhotoResponse>
+
+    @GET("auth/user")
+    fun getUserProfile(): Call<UploadPhotoResponse>
 
 }

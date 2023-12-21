@@ -17,6 +17,8 @@ class ProfileViewModel (private val pRepository: PostRepository): ViewModel() {
         return pRepository.getSession().asLiveData()
     }
 
+    fun getUserProfile(): LiveData<UploadPhotoResponse> = pRepository.getProfileUser()
+
     val snackbar: LiveData<Event<String>> = pRepository.snackBarText
 
     val isLoading: LiveData<Boolean> = pRepository.isLoading
