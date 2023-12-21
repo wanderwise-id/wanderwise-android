@@ -43,7 +43,9 @@ class DetailListCityAdapter(
             val dataNeedList = cities.values.toList()
             if (position < dataNeedList.size){
                 val dataNeed = dataNeedList[position]
-                holder.bind(context, dataNeed, homeViewModel)
+                GlobalScope.launch {
+                    holder.bind(context, dataNeed, homeViewModel)
+                }
 
                 holder.itemView.setOnClickListener {
                     val intent = Intent(holder.itemView.context, DetailInfoCityActivity::class.java)
@@ -87,7 +89,7 @@ class DetailListCityAdapter(
     class MyViewHolder(val binding: ListCityMoreDetailBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(context: Context, city: DataNeed, homeViewModel: HomeViewModel) {
+        suspend fun bind(context: Context, city: DataNeed, homeViewModel: HomeViewModel) {
             GlobalScope.launch(Dispatchers.Default) {
                 val clickedCity = homeViewModel.getClickedCity(city.key.toString())
                 if (clickedCity != null && clickedCity.key == city.key.toString()) {
@@ -97,10 +99,7 @@ class DetailListCityAdapter(
                 }
             }
 
-            Glide.with(binding.root)
-                .load(city.image)
-                .transform(CenterCrop(), RoundedCorners(40))
-                .into(binding.cityImage)
+            loadImageAsync(binding.cityImage, city.image.toString())
 
             binding.currentLocText.text = city.area.toString()
 
@@ -150,4 +149,14 @@ class DetailListCityAdapter(
 
 internal fun CoroutineScope.getString(safe: Int): CharSequence? {
     return getString(safe)
+}
+
+suspend fun loadImageAsync(imageView: ImageView, imageUrl: String) {
+    withContext(Dispatchers.Main) {
+        // Load image on the IO dispatcher
+        Glide.with(imageView)
+            .load(imageUrl)
+            .transform(CenterCrop(), RoundedCorners(40))
+            .into(imageView)
+    }
 }
