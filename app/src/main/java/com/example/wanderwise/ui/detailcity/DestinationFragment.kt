@@ -57,16 +57,16 @@ class DestinationFragment : Fragment() {
                     destinationsSnapshot.children.map {
                         destinations.add(
                             Destination(
-                                it.key,
-                                it.getValue<Destination>()!!.image,
-                                it.getValue<Destination>()!!.location,
-                                it.getValue<Destination>()!!.name
+                                key = it.key,
+                                image = it.getValue<Destination>()!!.image,
+                                location = it.getValue<Destination>()!!.location,
+                                name = it.getValue<Destination>()!!.name
                             )
                         )
                     }
                 }
 
-                cityAdapter = DestinationAdapter(destinations)
+                cityAdapter = cityKey?.let { DestinationAdapter(destinations, it) }!!
                 binding.rvDestination.layoutManager = LinearLayoutManager(requireContext())
                 binding.rvDestination.setHasFixedSize(true)
                 binding.rvDestination.adapter = cityAdapter
