@@ -82,6 +82,7 @@ class DetailListCityAdapter(
                     binding.weatherIcon.setImageResource(R.drawable.cloudy)
                 }
             }
+
             if (city.score != null) {
                 if (city.score.toString().toDouble() <= 33) {
                     binding.safetyLevelText.text = context.getString(R.string.danger)

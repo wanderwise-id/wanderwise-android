@@ -25,6 +25,10 @@ class ProfileViewModel (private val pRepository: PostRepository): ViewModel() {
 
     fun uploadPhotoProfile(image: File) = pRepository.uploadPhotoUser(image)
 
+    fun updateName(name: String) = pRepository.updateName(name)
+
+    fun updateEmail(email: String) = pRepository.updateEmail(email)
+
     fun logoutUser() {
         viewModelScope.launch {
             pRepository.logout()

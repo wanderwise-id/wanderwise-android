@@ -48,6 +48,18 @@ interface ApiService {
         @Part file: MultipartBody.Part
     ): UploadPhotoResponse
 
+    @FormUrlEncoded
+    @PUT("auth/user")
+    suspend fun updateName(
+        @Field("name") name: String
+    ): UploadPhotoResponse
+
+    @FormUrlEncoded
+    @PUT("auth/user")
+    suspend fun updateEmail(
+        @Field("email") email: String
+    ): UploadPhotoResponse
+
     @GET("auth/user")
     fun getPhotoProfile(): Call<UploadPhotoResponse>
 

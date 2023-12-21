@@ -120,6 +120,38 @@ class PostRepository private constructor
         }
     }
 
+    fun updateName(name: String) = liveData {
+        emit(Result.Loading)
+
+        try {
+            val user = runBlocking { preferences.getSession().first() }
+            val successRespone = ApiConfig.getApiService(user.token).updateName(name)
+            emit(Result.Success(successRespone.msg))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = Gson().fromJson(errorBody, UploadPhotoResponse::class.java)
+            emit(Result.Error("Sorry, ${errorResponse.msg}"))
+        } catch (e: Exception) {
+            emit(Result.Error(getStringError(context)))
+        }
+    }
+
+    fun updateEmail(email: String) = liveData {
+        emit(Result.Loading)
+
+        try {
+            val user = runBlocking { preferences.getSession().first() }
+            val successRespone = ApiConfig.getApiService(user.token).updateName(email)
+            emit(Result.Success(successRespone.msg))
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val errorResponse = Gson().fromJson(errorBody, UploadPhotoResponse::class.java)
+            emit(Result.Error("Sorry, ${errorResponse.msg}"))
+        } catch (e: Exception) {
+            emit(Result.Error(getStringError(context)))
+        }
+    }
+
     fun getImage(): LiveData<UploadPhotoResponse> {
         _isLoading.value = true
         val detail = MutableLiveData<UploadPhotoResponse>()
