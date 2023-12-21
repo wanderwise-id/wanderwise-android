@@ -1,5 +1,6 @@
 package com.example.wanderwise.ui.home
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -52,15 +53,13 @@ class HomeFragment : Fragment() {
     private lateinit var cityAdapter: CityExploreAdapter
 
     private var _binding: FragmentHomeBinding? = null
-    private val binding get() = _binding!! ?: throw IllegalStateException("Binding is null")
+    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
 
     private val homeViewModel by viewModels<HomeViewModel> {
         ViewModelFactory.getInstance(requireActivity())
     }
 
     private lateinit var postAdapter: PostHomeAdapter
-
-    private val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,19 +90,18 @@ class HomeFragment : Fragment() {
 
             val ref = db.getReference("cities/${currentLoc}")
             val cityListener = object : ValueEventListener {
+                @SuppressLint("SetTextI18n")
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (binding != null){
-                        if (dataSnapshot.exists()) {
-                            binding.locationName.text = dataSnapshot.key.toString()
-                            Glide.with(requireActivity())
-                                .load(dataSnapshot.getValue<City>()!!.image.toString())
-                                .transform(CenterCrop(), RoundedCorners(40))
-                                .into(binding.cityImage)
-                        } else {
-                            binding.locationName.text = "Unlisted"
-                            binding.cityImage.setImageResource(R.drawable.baseline_warning_image)
-                            disableDetailAccess = true
-                        }
+                    if (dataSnapshot.exists()) {
+                        binding.locationName.text = dataSnapshot.key.toString()
+                        Glide.with(requireActivity())
+                            .load(dataSnapshot.getValue<City>()!!.image.toString())
+                            .transform(CenterCrop(), RoundedCorners(40))
+                            .into(binding.cityImage)
+                    } else {
+                        binding.locationName.text = "Unlisted"
+                        binding.cityImage.setImageResource(R.drawable.baseline_warning_image)
+                        disableDetailAccess = true
                     }
                 }
 
@@ -218,11 +216,10 @@ class HomeFragment : Fragment() {
 
             val cities = ArrayList<City>()
             val scores = ArrayList<Double>()
-            var citiesSnapshot: Any? = null
             lifecycleScope.launch {
-                citiesSnapshot = db.getReference("cities").get().await()
+                val citiesSnapshot = db.getReference("cities").get().await()
 
-                (citiesSnapshot as DataSnapshot?)?.children?.forEach { city ->
+                citiesSnapshot.children.forEach { city ->
                     cities.add(
                         City(
                             city.key,
@@ -248,15 +245,9 @@ class HomeFragment : Fragment() {
                     }
                 }
 
-                val cityFavorite: CityFavorite = CityFavorite(
-                    id = 0,
-                    key = "",
-                    isLoved = false
-                )
-
                 scores.addAll(deferredScores.map { it.await() })
 
-                cityAdapter = CityExploreAdapter(requireActivity(), cities, scores, homeViewModel, cityFavorite, viewLifecycleOwner)
+                cityAdapter = CityExploreAdapter(requireActivity(), cities, scores, homeViewModel, CityFavorite(id = 0,key = "",isLoved = false), viewLifecycleOwner)
                 binding.exploreCityRv.layoutManager =
                     LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
                 binding.exploreCityRv.setHasFixedSize(true)
@@ -291,10 +282,12 @@ class HomeFragment : Fragment() {
                     )
                 }
 
-                postAdapter = PostHomeAdapter(requireActivity(), userAllPosts)
-                binding.popularPostRv.layoutManager = LinearLayoutManager(requireActivity(),  LinearLayoutManager.HORIZONTAL, false)
-                binding.popularPostRv.setHasFixedSize(true)
-                binding.popularPostRv.adapter = postAdapter
+                if (binding != null){
+                    postAdapter = PostHomeAdapter(requireActivity(), userAllPosts)
+                    binding.popularPostRv.layoutManager = LinearLayoutManager(requireActivity(),  LinearLayoutManager.HORIZONTAL, false)
+                    binding.popularPostRv.setHasFixedSize(true)
+                    binding.popularPostRv.adapter = postAdapter
+                }
             }
         } catch (e: Exception){
             Log.e("Error", "Failed to fetch data: ${e.message}")
