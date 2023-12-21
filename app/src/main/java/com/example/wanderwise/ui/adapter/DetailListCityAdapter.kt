@@ -17,6 +17,7 @@ import com.example.wanderwise.databinding.ListCityMoreDetailBinding
 import com.example.wanderwise.ui.detailcity.DetailInfoCityActivity
 import com.example.wanderwise.ui.home.HomeViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -89,6 +90,7 @@ class DetailListCityAdapter(
     class MyViewHolder(val binding: ListCityMoreDetailBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
+        @OptIn(DelicateCoroutinesApi::class)
         suspend fun bind(context: Context, city: DataNeed, homeViewModel: HomeViewModel) {
             GlobalScope.launch(Dispatchers.Default) {
                 val clickedCity = homeViewModel.getClickedCity(city.key.toString())

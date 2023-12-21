@@ -87,54 +87,33 @@ class RankMapsFragment : Fragment() {
                                         val sortedEntries = scoreLast.entries.sortedByDescending { it.value }
                                         val top3Entries = sortedEntries.take(3)
 
-                                        val boundsBuilder = LatLngBounds.Builder()
-
-// Initialize a counter for ranking
-                                        var rankCounter = 0
-
-                                        for ((key, value) in top3Entries) {
-                                            // Move the creation of LatLng inside the loop
+                                        top3Entries.forEach() {
                                             val markerLatLng = LatLng(location.lat.toString().toDouble(), location.lon.toString().toDouble())
 
-                                            val customMarker = when (rankCounter) {
-                                                0 -> rankSatu
-                                                1 -> rankDua
-                                                2 -> rankTiga
-                                                else -> throw IllegalStateException("Unexpected rankCounter: $rankCounter")
-                                            }
+                                            Log.d("isiTop3Entries", "${it.key} and ${it.value}")
 
                                             mMap.addMarker(
                                                 MarkerOptions()
                                                     .position(markerLatLng)
-                                                    .title(key)
-                                                    .snippet(value.toString())
-                                                    .icon(customMarker)
+                                                    .title(it.key)
+                                                    .snippet(it.value.toString())
+                                                    .icon(rankSatu)
                                             ).also { marker ->
                                                 if (marker != null) {
-                                                    marker.tag = key
+                                                    marker.tag = it.key
                                                 }
                                             }
-
-                                            // Increment the rankCounter
-                                            rankCounter++
                                         }
 
-// Check if there are included points before building LatLngBounds
-                                        if (boundsBuilder.build().southwest.latitude != boundsBuilder.build().northeast.latitude) {
-                                            // Animasi kamera
-                                            val bounds: LatLngBounds = boundsBuilder.build()
-                                            mMap.animateCamera(
-                                                CameraUpdateFactory.newLatLngBounds(
-                                                    bounds,
-                                                    resources.displayMetrics.widthPixels,
-                                                    resources.displayMetrics.heightPixels,
-                                                    300
-                                                )
+                                        val bounds: LatLngBounds = boundsBuilder.build()
+                                        mMap.animateCamera(
+                                            CameraUpdateFactory.newLatLngBounds(
+                                                bounds,
+                                                resources.displayMetrics.widthPixels,
+                                                resources.displayMetrics.heightPixels,
+                                                300
                                             )
-                                        } else {
-                                            // Handle the case where there are no included points
-                                            Log.e("TAG", "No included points to build LatLngBounds.")
-                                        }
+                                        )
                                     }
                                 }
 
@@ -151,11 +130,7 @@ class RankMapsFragment : Fragment() {
                 Log.w("TAG", "Failed to read city value.", error.toException())
             }
         }
-
         refCities.addValueEventListener(cityListener)
-
-
-
 
         setMapStyle()
     }
