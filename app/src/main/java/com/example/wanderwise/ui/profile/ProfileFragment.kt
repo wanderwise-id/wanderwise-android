@@ -33,6 +33,7 @@ import com.example.wanderwise.databinding.FragmentProfileBinding
 import com.example.wanderwise.ui.ViewModelFactory
 import com.example.wanderwise.ui.post.addpost.AddPostViewModel
 import com.google.android.material.snackbar.Snackbar
+import okhttp3.internal.notify
 
 
 class ProfileFragment : Fragment() {
