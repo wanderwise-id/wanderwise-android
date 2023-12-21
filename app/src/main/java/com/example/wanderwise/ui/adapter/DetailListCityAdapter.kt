@@ -1,6 +1,7 @@
 package com.example.wanderwise.ui.adapter
 
-import android.content.Context
+import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -8,19 +9,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.wanderwise.R
-import com.example.wanderwise.data.database.City
 import com.example.wanderwise.data.database.DataNeed
-import com.example.wanderwise.data.database.Destination
-import com.example.wanderwise.data.database.Information
-import com.example.wanderwise.data.database.Score
-import com.example.wanderwise.data.database.Weather
 import com.example.wanderwise.databinding.ListCityMoreDetailBinding
-import com.example.wanderwise.databinding.ListDestinationBinding
-import com.google.firebase.database.getValue
+import com.example.wanderwise.ui.detailcity.DetailInfoCityActivity
+import kotlinx.coroutines.CoroutineScope
 
 class DetailListCityAdapter(
-    private val context: Context,
-    private val city: ArrayList<DataNeed>
+    private val context: CoroutineScope,
+    private val cities: MutableMap<String,DataNeed>
 ): RecyclerView.Adapter<DetailListCityAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -33,20 +29,29 @@ class DetailListCityAdapter(
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        if (city.isNotEmpty() && position < city.size) {
-            val cities = city[position]
-            holder.bind(context, cities)
+        if (cities.isNotEmpty() && position < cities.size) {
+            val dataNeedList = cities.values.toList()
+            if (position < dataNeedList.size){
+                val dataNeed = dataNeedList[position]
+                holder.bind(context, dataNeed)
+
+                holder.itemView.setOnClickListener {
+                    val intent = Intent(holder.itemView.context, DetailInfoCityActivity::class.java)
+                    intent.putExtra(DetailInfoCityActivity.CITY, dataNeed.key.toString())
+                    holder.itemView.context.startActivity(intent)
+                }
+            }
         }
     }
 
     override fun getItemCount(): Int {
-        return city.size
+        return cities.size
     }
 
     class MyViewHolder(val binding: ListCityMoreDetailBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(context: Context, city: DataNeed) {
+        fun bind(context: CoroutineScope, city: DataNeed) {
 
             Glide.with(binding.root)
                 .load(city.image)
@@ -92,4 +97,8 @@ class DetailListCityAdapter(
             }
         }
     }
+}
+
+internal fun CoroutineScope.getString(safe: Int): CharSequence? {
+    return getString(safe)
 }

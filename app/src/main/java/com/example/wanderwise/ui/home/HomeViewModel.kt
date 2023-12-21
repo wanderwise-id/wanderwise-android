@@ -24,9 +24,9 @@ class HomeViewModel (private val pRepository: PostRepository): ViewModel() {
 
     fun getAllCity() = pRepository.getAllFav()
 
-    fun getClickedCity(keyCity: String): LiveData<CityFavorite> = pRepository.getClickedCity(keyCity)
+    fun getClickedCity(keyCity: String): CityFavorite = pRepository.getClickedCity(keyCity)
 
-    fun delete(cityFavorite: CityFavorite){
+    fun delete(cityFavorite: String){
         pRepository.deleteCityFav(cityFavorite)
     }
 

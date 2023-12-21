@@ -6,17 +6,23 @@ import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
-import com.example.wanderwise.data.database.Score
 import com.example.wanderwise.data.local.database.CityFavorite
 import com.example.wanderwise.databinding.ListExploreCityBinding
 import com.example.wanderwise.ui.detailcity.DetailInfoCityActivity
 import com.example.wanderwise.ui.home.HomeViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class CityExploreAdapter(
@@ -51,12 +57,29 @@ class CityExploreAdapter(
         }
 
         holder.binding.loveIcon.setOnClickListener {
-            cityFavorite.let {
-                it.key = city.key.toString()
-                it.isLoved = true
-            }
+            GlobalScope.launch(Dispatchers.Default) {
+                val clickedCity = homeViewModel.getClickedCity(city.key.toString())
+                if (clickedCity != null && clickedCity.key == city.key.toString()){
+                    homeViewModel.delete(clickedCity.key.toString())
 
-            homeViewModel.insert(cityFavorite)
+                    withContext(Dispatchers.Main){
+                        var loveIcon: ImageView = it as ImageView
+                        loveIcon.setImageDrawable(ContextCompat.getDrawable(loveIcon.context, R.drawable.love_outline_icon))
+                    }
+                } else {
+                    cityFavorite.let {
+                        it.key = city.key.toString()
+                        it.isLoved = true
+                    }
+
+                    homeViewModel.insert(cityFavorite)
+
+                    withContext(Dispatchers.Main){
+                        var loveIcon: ImageView = it as ImageView
+                        loveIcon.setImageDrawable(ContextCompat.getDrawable(loveIcon.context, R.drawable.love_fill_icon))
+                    }
+                }
+            }
         }
     }
 
@@ -68,7 +91,8 @@ class CityExploreAdapter(
 
         @SuppressLint("SetTextI18n")
         fun bind(context: Context, score:Double, city: City, homeViewModel: HomeViewModel, cityFavorite: CityFavorite, viewLifecycleOwner: LifecycleOwner) {
-            homeViewModel.getClickedCity(city.key.toString()).observe(viewLifecycleOwner) { clickedCity ->
+            GlobalScope.launch(Dispatchers.Default) {
+                val clickedCity = homeViewModel.getClickedCity(city.key.toString())
                 if (clickedCity != null && clickedCity.key == city.key.toString()) {
                     binding.loveIcon.setImageDrawable(ContextCompat.getDrawable(binding.loveIcon.context, R.drawable.love_fill_icon))
                 } else {

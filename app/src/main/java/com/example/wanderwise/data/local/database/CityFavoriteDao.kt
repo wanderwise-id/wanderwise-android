@@ -15,7 +15,7 @@ interface CityFavoriteDao {
     fun getCity(): LiveData<List<CityFavorite>>
 
     @Query("SELECT * FROM cityFav WHERE `key` = :city")
-    fun getCityClicked(city: String): LiveData<CityFavorite>
+    fun getCityClicked(city: String): CityFavorite
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertFav(userFavorite: CityFavorite)
@@ -23,7 +23,7 @@ interface CityFavoriteDao {
     @Update
     fun updateFav(userFavorite: CityFavorite)
 
-    @Delete
-    fun deleteFav(userFavorite: CityFavorite)
+    @Query("DELETE FROM cityFav WHERE `key` = :city")
+    fun deleteFav(city: String)
 
 }

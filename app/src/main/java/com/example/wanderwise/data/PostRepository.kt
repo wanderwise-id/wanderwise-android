@@ -62,13 +62,13 @@ class PostRepository private constructor
 
     fun getAllFav(): LiveData<List<CityFavorite>> = databaseFav.getCity()
 
-    fun getClickedCity(city: String): LiveData<CityFavorite> = databaseFav.getCityClicked(city)
+    fun getClickedCity(city: String): CityFavorite = databaseFav.getCityClicked(city)
 
     fun insertCityFav(city: CityFavorite) {
         executorService.execute { databaseFav.insertFav(city) }
     }
 
-    fun deleteCityFav(city: CityFavorite) {
+    fun deleteCityFav(city: String) {
         executorService.execute { databaseFav.deleteFav(city) }
     }
 

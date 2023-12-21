@@ -6,30 +6,23 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
 import com.example.wanderwise.data.database.DataNeed
 import com.example.wanderwise.data.database.Information
 import com.example.wanderwise.data.database.Score
-import com.example.wanderwise.data.database.ScoreCurrent
 import com.example.wanderwise.data.database.Weather
-import com.example.wanderwise.data.local.database.CityFavorite
-import com.example.wanderwise.data.preferences.UserModel
 import com.example.wanderwise.databinding.ActivityFavoriteBinding
 import com.example.wanderwise.ui.ViewModelFactory
-import com.example.wanderwise.ui.adapter.CityExploreAdapter
 import com.example.wanderwise.ui.adapter.DetailListCityAdapter
 import com.example.wanderwise.ui.home.HomeViewModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.lang.Exception
 
 class FavoriteActivity : AppCompatActivity() {
 
@@ -48,57 +41,55 @@ class FavoriteActivity : AppCompatActivity() {
 
         val db =
             FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
-
-
         homeViewModel.getAllCity().observe(this@FavoriteActivity) { cityLove ->
-            cityLove.forEach() {
-                val cities = ArrayList<DataNeed>()
-                if (cityLove != null) {
-                    db.getReference("scores/${it.key}").limitToLast(1).get()
-                        .addOnSuccessListener { score ->
-                            DataNeed(
-                                score.getValue<DataNeed>()!!.score
-                            )
+            var cities:MutableMap<String, DataNeed> = mutableMapOf()
+            try {
+                lifecycleScope.launch {
+                    cityLove.forEach() {
+                        val citySnapshot = db.getReference("cities/${it.key}").get().await()
+
+                        if (citySnapshot.exists()){
+                            cities.put(
+                                it.key.toString(),
+                                DataNeed(
+                                key = it.key,
+                                image = citySnapshot.getValue<City>()!!.image.toString(),
+                                area = citySnapshot.getValue<City>()!!.area
+                            ))
                         }
 
-                    db.getReference("informations/${it.key}}").get()
-                        .addOnSuccessListener { info ->
-                            info.children.map { infor ->
-                                cities.add(
-                                    DataNeed(
-                                        infor.key,
-                                        infor.getValue<DataNeed>()!!.numberOfDestination,
-                                        infor.getValue<DataNeed>()!!.numberOfHospitals,
-                                        infor.getValue<DataNeed>()!!.numberOfPoliceStations
-                                    )
-                                )
+                        val informationSnapshot = db.getReference("informations/${it.key}").limitToLast(1).get().await()
+
+                        if (informationSnapshot.hasChildren()){
+                            informationSnapshot.children.forEach{
+                                cities[it.key]?.numberOfDestination = informationSnapshot.getValue<Information>()!!.numberOfDestinations
+                                cities[it.key]?.numberOfHospitals = informationSnapshot.getValue<Information>()!!.numberOfHospitals
+                                cities[it.key]?.numberOfPoliceStations = informationSnapshot.getValue<Information>()!!.numberOfPoliceStations
                             }
                         }
 
-                    val refWeathers = db.getReference("weathers/${it.key}}")
-                    val weatherListener = object : ValueEventListener {
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-                            if (dataSnapshot.childrenCount > 0) {
-                                cities.add(
-                                    DataNeed(
-                                        dataSnapshot.getValue<DataNeed>()!!.weather,
-                                        dataSnapshot.getValue<DataNeed>()!!.temperature
-                                    )
-                                )
-                            }
+                        val weatherSnapshot = db.getReference("weathers/${it.key}").get().await()
+
+                        if (weatherSnapshot.exists()){
+                            cities[it.key]?.weather = weatherSnapshot.getValue<Weather>()!!.weather
+                            cities[it.key]?.temperature = weatherSnapshot.getValue<Weather>()!!.temperature
                         }
 
-                        override fun onCancelled(databaseError: DatabaseError) {
-                            Log.w("TAG", "loadPost:onCancelled", databaseError.toException())
+                        val scoreSnapshot = db.getReference("scores/${it.key}").limitToLast(1).get().await()
+
+                        if (scoreSnapshot.hasChildren()){
+                            scoreSnapshot.children.forEach{
+                                cities[it.key]?.score = weatherSnapshot.getValue<Score>()!!.score
+                            }
                         }
                     }
-                    refWeathers.addValueEventListener(weatherListener)
                     detailListCityAdapter = DetailListCityAdapter(this, cities)
-                    binding.rvCityLove.layoutManager =
-                        LinearLayoutManager(this)
+                    binding.rvCityLove.layoutManager = LinearLayoutManager(this@FavoriteActivity)
                     binding.rvCityLove.setHasFixedSize(true)
                     binding.rvCityLove.adapter = detailListCityAdapter
                 }
+            }  catch (e: Exception){
+                Log.e("Error", "Failed to fetch data: ${e.message}")
             }
         }
 
