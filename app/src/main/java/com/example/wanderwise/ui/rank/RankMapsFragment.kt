@@ -1,31 +1,34 @@
 package com.example.wanderwise.ui.rank
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.res.Resources
-import androidx.fragment.app.Fragment
-
+import android.location.Address
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.wanderwise.R
 import com.example.wanderwise.data.database.City
 import com.example.wanderwise.data.database.LocationCity
+import com.example.wanderwise.data.database.Marker
 import com.example.wanderwise.data.database.Score
-import com.example.wanderwise.ui.adapter.CityExploreAdapter
-
+import com.example.wanderwise.ui.ViewModelFactory
+import com.example.wanderwise.ui.home.HomeViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.LatLngBounds.Builder
+import com.google.android.gms.maps.model.LatLngBounds.builder
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.database.DataSnapshot
@@ -33,11 +36,17 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.io.IOException
 
 class RankMapsFragment : Fragment() {
+    private val homeViewModel by viewModels<HomeViewModel> {
+        ViewModelFactory.getInstance(requireActivity())
+    }
     private lateinit var mMap: GoogleMap
 
-    private val boundsBuilder = LatLngBounds.Builder()
+    private val boundsBuilder = Builder()
 
     private val callback = OnMapReadyCallback { googleMap ->
         /**
@@ -51,86 +60,91 @@ class RankMapsFragment : Fragment() {
          */
         mMap = googleMap
 
-        val rankSatu = BitmapDescriptorFactory.fromResource(R.drawable.rank1)
-        val rankDua = BitmapDescriptorFactory.fromResource(R.drawable.rank2)
-        val rankTiga = BitmapDescriptorFactory.fromResource(R.drawable.rank3)
+        val rank = listOf<Any>(
+            BitmapDescriptorFactory.fromResource(R.drawable.rank1),
+            BitmapDescriptorFactory.fromResource(R.drawable.rank2),
+            BitmapDescriptorFactory.fromResource(R.drawable.rank3))
 
         val db = FirebaseDatabase.getInstance("https://wanderwise-application-default-rtdb.asia-southeast1.firebasedatabase.app")
 
-        val refCities = db.getReference("cities")
-        val refScores = db.getReference("scores")
+        try {
+            lifecycleScope.launch {
+                var location: Pair<Double, Double>? = null
+                var location_label = ""
+                homeViewModel.getSessionUser().observe(viewLifecycleOwner) { user ->
+                    location = getLatLngFromCityName(requireContext(), user.userLocation)!!
+                    boundsBuilder.include(LatLng(location!!.first, location!!.second))
+                    location_label = user.userLocation
+                }
 
-        val cityListener = object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.childrenCount > 0) {
+                var markers: ArrayList<Marker> = arrayListOf()
+                val refCities = db.getReference("cities").get().await()
 
-                    dataSnapshot.children.map { citySnapshot ->
-                        val city = citySnapshot.getValue<City>()
-                        val location = citySnapshot.child("location").getValue<LocationCity>()
+                refCities.children.forEach { city ->
+                    val refScores =
+                        db.getReference("scores/${city.key}").limitToLast(1).get().await()
 
-                        if (city != null && location != null) {
+                    refScores.children.forEach { score ->
+                        markers.add(
+                            Marker(
+                                key = city.key,
+                                score = score.getValue<Score>()!!.score,
+                                location = city.child("location").getValue<LocationCity>()!!
+                            )
+                        )
+                    }
+                }
 
-                            val cityKey = citySnapshot.key
-                            val scoreLast: MutableMap<String, Int> = mutableMapOf()
+                val sortedMarkers =
+                    markers.toList().sortedByDescending { it.score.toString().toDouble() }
+                val top3Markers = sortedMarkers.take(3)
 
-                            refScores.child(cityKey.toString()).limitToLast(1).addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(scoreSnapshot: DataSnapshot) {
-                                    if (scoreSnapshot.childrenCount > 0){
-                                        scoreSnapshot.children.forEach{
-                                            if(it.getValue<Score>()!!.score != null){
-                                                scoreLast[cityKey.toString()] = it.getValue<Score>()!!.score.toString().toDouble().toInt()
-                                            } else{
-                                                scoreLast[cityKey.toString()] = 0
-                                            }
-                                        }
+                for (i in 0 until 3) {
+                    val location: LocationCity = top3Markers[i].location as LocationCity
+                    val markerLatLng = LatLng(location.lat as Double, location.lon as Double)
 
-                                        val sortedEntries = scoreLast.entries.sortedByDescending { it.value }
-                                        val top3Entries = sortedEntries.take(3)
-
-                                        top3Entries.forEach() {
-                                            val markerLatLng = LatLng(location.lat.toString().toDouble(), location.lon.toString().toDouble())
-
-                                            Log.d("isiTop3Entries", "${it.key} and ${it.value}")
-
-                                            mMap.addMarker(
-                                                MarkerOptions()
-                                                    .position(markerLatLng)
-                                                    .title(it.key)
-                                                    .snippet(it.value.toString())
-                                                    .icon(rankSatu)
-                                            ).also { marker ->
-                                                if (marker != null) {
-                                                    marker.tag = it.key
-                                                }
-                                            }
-                                        }
-
-                                        val bounds: LatLngBounds = boundsBuilder.build()
-                                        mMap.animateCamera(
-                                            CameraUpdateFactory.newLatLngBounds(
-                                                bounds,
-                                                resources.displayMetrics.widthPixels,
-                                                resources.displayMetrics.heightPixels,
-                                                300
-                                            )
-                                        )
-                                    }
-                                }
-
-                                override fun onCancelled(error: DatabaseError) {
-                                    Log.w("TAG", "Failed to read score value.", error.toException())
-                                }
-                            })
+                    mMap.addMarker(
+                        MarkerOptions()
+                            .position(markerLatLng)
+                            .title(top3Markers[i].key.toString())
+                            .snippet(top3Markers[i].score.toString())
+                            .icon(rank[i] as? BitmapDescriptor)
+                    ).also { marker ->
+                        if (marker != null) {
+                            marker.tag = top3Markers[i].key.toString()
                         }
                     }
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.w("TAG", "Failed to read city value.", error.toException())
+                val user_location = LatLng(location!!.first, location!!.second)
+                mMap.addMarker(
+                    MarkerOptions()
+                        .position(user_location)
+                        .title("Your Current Location")
+                        .snippet(location_label)
+                ).also { marker ->
+                    if (marker != null) {
+                        marker.tag = location_label
+                    }
+                }
+
+                val bound = boundsBuilder.build()
+                mMap.animateCamera(
+                    CameraUpdateFactory.newLatLngBounds(
+                        bound,
+                        resources.displayMetrics.widthPixels,
+                        resources.displayMetrics.heightPixels,
+                        resources.displayMetrics.widthPixels
+                    )
+                )
+
+                mMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(user_location, 10.0f)
+                )
             }
+        } catch (e: Exception){
+            Log.e("Error", "Failed to fetch data: ${e.message}")
         }
-        refCities.addValueEventListener(cityListener)
 
         setMapStyle()
     }
@@ -166,5 +180,23 @@ class RankMapsFragment : Fragment() {
         } catch (exception: Resources.NotFoundException) {
             Log.e(TAG, getString(R.string.map), exception)
         }
+    }
+
+    fun getLatLngFromCityName(context: Context, cityName: String): Pair<Double, Double>? {
+        val geocoder = Geocoder(context)
+
+        try {
+            val addresses: List<Address> = geocoder.getFromLocationName(cityName, 1)!!
+
+            if (addresses.isNotEmpty()) {
+                val latitude = addresses[0].latitude
+                val longitude = addresses[0].longitude
+                return Pair(latitude, longitude)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return null
     }
 }
